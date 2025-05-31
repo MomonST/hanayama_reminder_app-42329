@@ -68,6 +68,10 @@ group :test do
   gem "selenium-webdriver"
 end
 
+group :production do
+  gem 'pg'
+end
+
 gem 'devise'                    # 認証機能
 gem 'jquery-rails'              # JavaScript
 gem 'kaminari'                  # ページネーション
