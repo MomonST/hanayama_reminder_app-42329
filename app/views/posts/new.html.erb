@@ -1,2 +1,74 @@
-<h1>Posts#new</h1>
-<p>Find me in app/views/posts/new.html.erb</p>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="card-title mb-4"><i class="bi bi-camera me-2"></i>リアルタイム投稿</h2>
+        
+        <%= form_with model: @post, local: true do |f| %>
+          <% if @post.errors.any? %>
+            <div class="alert alert-danger">
+              <h4><%= pluralize(@post.errors.count, "error") %> prohibited this post from being saved:</h4>
+              <ul>
+                <% @post.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <div class="mb-3">
+            <%= f.label :flower_mountain_id, "花山スポット", class: "form-label" %>
+            <%= f.collection_select :flower_mountain_id, @flower_mountains, :id, 
+                ->(fm) { "#{fm.mountain.name} - #{fm.flower.name}" }, 
+                { selected: @flower_mountain_id, include_blank: "選択してください" }, 
+                class: "form-select", required: true %>
+          </div>
+          
+          <div class="mb-3">
+            <%= f.label :content, "コメント", class: "form-label" %>
+            <%= f.text_area :content, class: "form-control", rows: 4, required: true %>
+            <div class="form-text">現在の花の状態や登山の様子などを共有しましょう</div>
+          </div>
+          
+          <div class="mb-4">
+            <%= f.label :image_url, "写真", class: "form-label" %>
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-camera"></i></span>
+              <%= f.file_field :image_url, class: "form-control", accept: "image/*", id: "post-image" %>
+            </div>
+            
+            <div id="image-preview" class="mt-2 d-none">
+              <img src="#" alt="プレビュー" class="img-thumbnail" style="max-height: 200px;">
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <%= f.submit "投稿する", class: "btn btn-pink btn-lg" %>
+            <%= link_to "キャンセル", :back, class: "btn btn-outline-secondary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 画像プレビュー
+  document.getElementById('post-image').addEventListener('change', function(e) {
+    const preview = document.getElementById('image-preview');
+    const previewImg = preview.querySelector('img');
+    
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        preview.classList.remove('d-none');
+      }
+      
+      reader.readAsDataURL(this.files[0]);
+    } else {
+      preview.classList.add('d-none');
+    }
+  });
+</script>
