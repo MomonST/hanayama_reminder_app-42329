@@ -10,7 +10,84 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_31_094730) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_31_105452) do
+  create_table "favorites", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "flower_mountain_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["flower_mountain_id"], name: "index_favorites_on_flower_mountain_id"
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
+  create_table "flower_mountains", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "flower_id", null: false
+    t.bigint "mountain_id", null: false
+    t.integer "peak_month"
+    t.text "bloom_info"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["flower_id"], name: "index_flower_mountains_on_flower_id"
+    t.index ["mountain_id"], name: "index_flower_mountains_on_mountain_id"
+  end
+
+  create_table "flowers", charset: "utf8mb3", force: :cascade do |t|
+    t.string "name"
+    t.string "scientific_name"
+    t.integer "bloom_start_month"
+    t.integer "bloom_end_month"
+    t.text "description"
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "likes", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "post_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_likes_on_post_id"
+    t.index ["user_id"], name: "index_likes_on_user_id"
+  end
+
+  create_table "mountains", charset: "utf8mb3", force: :cascade do |t|
+    t.string "name"
+    t.string "region"
+    t.string "difficulty_level"
+    t.integer "elevation"
+    t.decimal "latitude", precision: 10
+    t.decimal "longitude", precision: 10
+    t.text "description"
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "notifications", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "flower_mountain_id", null: false
+    t.integer "days_before"
+    t.date "notification_date"
+    t.boolean "sent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["flower_mountain_id"], name: "index_notifications_on_flower_mountain_id"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "posts", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "flower_mountain_id", null: false
+    t.text "content"
+    t.string "image_url"
+    t.integer "likes_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["flower_mountain_id"], name: "index_posts_on_flower_mountain_id"
+    t.index ["user_id"], name: "index_posts_on_user_id"
+  end
+
   create_table "users", charset: "utf8mb3", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -31,4 +108,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_31_094730) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "favorites", "flower_mountains"
+  add_foreign_key "favorites", "users"
+  add_foreign_key "flower_mountains", "flowers"
+  add_foreign_key "flower_mountains", "mountains"
+  add_foreign_key "likes", "posts"
+  add_foreign_key "likes", "users"
+  add_foreign_key "notifications", "flower_mountains"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "posts", "flower_mountains"
+  add_foreign_key "posts", "users"
 end
