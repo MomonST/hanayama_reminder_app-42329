@@ -1,0 +1,146 @@
+<% content_for :use_google_maps, true %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title mb-4"><i class="bi bi-map me-2"></i>花登山マップ</h2>
+        
+        <!-- フィルター -->
+        <%= form_with url: flower_mountains_path, method: :get, local: true, class: "row g-3 mb-4" do |f| %>
+          <div class="col-md-3">
+            <label class="form-label">地域</label>
+            <%= f.select :region, User::REGIONS, { selected: @region, include_blank: "すべて" }, 
+                class: "form-select" %>
+          </div>
+          
+          <div class="col-md-3">
+            <label class="form-label">月</label>
+            <%= f.select :month, (1..12).map { |m| ["#{m}月", m] }, 
+                { selected: @month, include_blank: "すべて" }, class: "form-select" %>
+          </div>
+          
+          <div class="col-md-3">
+            <label class="form-label">難易度</label>
+            <%= f.select :difficulty, ["初心者", "中級者", "上級者"], 
+                { selected: @difficulty, include_blank: "すべて" }, class: "form-select" %>
+          </div>
+          
+          <div class="col-md-3 d-flex align-items-end">
+            <%= f.submit "検索", class: "btn btn-success w-100" %>
+          </div>
+        <% end %>
+        
+        <!-- 地図表示エリア -->
+        <div id="map" style="height: 500px;" class="rounded mb-4"></div>
+        
+        <!-- 花山リスト -->
+        <h3 class="mb-3">検索結果: <%= @flower_mountains.count %>件</h3>
+        
+        <div class="row">
+          <% @flower_mountains.each do |fm| %>
+            <div class="col-md-4 col-sm-6 mb-4">
+              <%= link_to flower_mountain_path(fm), class: "text-decoration-none" do %>
+                <div class="card border-0 shadow-sm h-100 hover-card">
+                  <% if fm.mountain.image_url.present? %>
+                    <%= image_tag fm.mountain.image_url, class: "card-img-top", style: "height: 160px; object-fit: cover;" %>
+                  <% else %>
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
+                      <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                    </div>
+                  <% end %>
+                  
+                  <div class="card-body">
+                    <h5 class="card-title mb-1"><%= fm.mountain.name %></h5>
+                    <p class="text-muted mb-2">
+                      <i class="bi bi-flower1 me-1"></i><%= fm.flower.name %>
+                    </p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge bg-light text-dark">
+                        <%= fm.mountain.difficulty_level %>
+                      </span>
+                      
+                      <% days_left = fm.days_until_peak %>
+                      <% if days_left %>
+                        <span class="text-success fw-bold">あと<%= days_left %>日</span>
+                      <% else %>
+                        <span class="text-muted">時期未定</span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let map;
+  let markers = [];
+  
+  function initMap() {
+    // 日本の中心あたりを初期表示
+    const center = { lat: 36.2048, lng: 138.2529 };
+    map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 5,
+      center: center,
+    });
+    
+    // マーカーデータ
+    const locations = <%= raw @map_data.to_json %>;
+    
+    // マーカーを追加
+    locations.forEach(location => {
+      if (location.lat && location.lng) {
+        const marker = new google.maps.Marker({
+          position: { lat: location.lat, lng: location.lng },
+          map: map,
+          title: location.name
+        });
+        
+        // 情報ウィンドウの内容
+        const contentString = `
+          <div style="padding: 10px; max-width: 200px;">
+            <h5 style="margin-top: 0;">${location.name}</h5>
+            <p><strong>花:</strong> ${location.flower}</p>
+            <p><strong>難易度:</strong> ${location.difficulty || '未設定'}</p>
+            ${location.days_left ? `<p><strong>見頃まで:</strong> あと${location.days_left}日</p>` : ''}
+            <a href="/flower_mountains/${location.id}" class="btn btn-sm btn-success">詳細を見る</a>
+          </div>
+        `;
+        
+        const infowindow = new google.maps.InfoWindow({
+          content: contentString,
+        });
+        
+        marker.addListener("click", () => {
+          infowindow.open(map, marker);
+        });
+        
+        markers.push(marker);
+      }
+    });
+    
+    // マーカーがある場合は表示範囲を調整
+    if (markers.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      markers.forEach(marker => {
+        bounds.extend(marker.getPosition());
+      });
+      map.fitBounds(bounds);
+      
+      // ズームが近すぎる場合は調整
+      const listener = google.maps.event.addListener(map, "idle", function() {
+        if (map.getZoom() > 10) {
+          map.setZoom(10);
+        }
+        google.maps.event.removeListener(listener);
+      });
+    }
+  }
+</script>

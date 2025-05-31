@@ -1,2 +1,353 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<% if user_signed_in? %>
+  <!-- ログイン済みユーザー向けダッシュボード -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-4">
+          <h2 class="text-gradient mb-3">見頃の花を見逃さない</h2>
+          <p class="lead mb-4">
+            あなたの行きたいエリアの高山植物の開花時期を事前にお知らせ。<br>
+            忙しい日常でも、最高のタイミングで山の花に出会えます。
+          </p>
+          
+          <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+            <% @regions.each do |region| %>
+              <%= link_to region, root_path(region: region), 
+                  class: "btn #{@region == region ? 'btn-success' : 'btn-outline-success'} btn-sm" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 通知カード -->
+  <h3 class="mb-3"><i class="bi bi-bell me-2"></i>あなたの通知</h3>
+  <div class="row mb-5">
+    <% if @notifications.any? %>
+      <% @notifications.each do |notification| %>
+        <div class="col-md-6 mb-4">
+          <div class="card border-start border-4 border-pink h-100 shadow-hover">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-flower1 text-pink me-1"></i>
+                  <%= notification.flower_mountain.flower.name %>
+                </h5>
+                <span class="badge bg-light text-dark">
+                  <%= notification.flower_mountain.mountain.difficulty_level %>
+                </span>
+              </div>
+              
+              <p class="text-muted mb-2">
+                <i class="bi bi-geo-alt me-1"></i>
+                <%= notification.flower_mountain.mountain.name %> 
+                (<%= notification.flower_mountain.mountain.region %>)
+              </p>
+              
+              <div class="d-flex mt-3">
+                <div class="me-3">
+                  <% if notification.flower_mountain.flower.image_url.present? %>
+                    <%= image_tag notification.flower_mountain.flower.image_url, 
+                        class: "rounded", style: "width: 80px; height: 80px; object-fit: cover;" %>
+                  <% else %>
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px;">
+                      <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <div>
+                  <% days_left = notification.flower_mountain.days_until_peak %>
+                  <% if days_left %>
+                    <div class="fs-4 fw-bold text-success mb-1">あと<%= days_left %>日</div>
+                    <p class="text-muted small mb-2">
+                      見頃予想: <%= notification.flower_mountain.peak_month %>月中旬
+                    </p>
+                  <% else %>
+                    <div class="fs-5 fw-bold text-muted mb-1">時期未定</div>
+                  <% end %>
+                  
+                  <div class="d-flex gap-2 mt-2">
+                    <a href="#" class="btn btn-sm btn-success">
+                      <i class="bi bi-calendar-plus me-1"></i>カレンダー
+                    </a>
+                    <%= link_to flower_mountain_path(notification.flower_mountain), class: "btn btn-sm btn-outline-secondary" do %>
+                      詳細
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-12">
+        <div class="card border-0 bg-light">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-bell-slash text-muted mb-3" style="font-size: 2rem;"></i>
+            <h5>通知が設定されていません</h5>
+            <p class="text-muted">花山スポットを選んで通知を設定しましょう</p>
+            <%= link_to "花登山マップを見る", flower_mountains_path, class: "btn btn-success mt-2" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- 地域の花山スポット -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-geo-alt me-2"></i><%= @region %>の花山スポット</h3>
+    <%= link_to "すべて見る", flower_mountains_path(region: @region), class: "btn btn-sm btn-outline-success" %>
+  </div>
+  
+  <div class="row mb-5">
+    <% if @flower_mountains.any? %>
+      <% @flower_mountains.each do |fm| %>
+        <div class="col-md-4 col-sm-6 mb-4">
+          <%= link_to flower_mountain_path(fm), class: "text-decoration-none" do %>
+            <div class="card border-0 shadow-sm h-100 hover-card">
+              <% if fm.mountain.image_url.present? %>
+                <%= image_tag fm.mountain.image_url, class: "card-img-top", style: "height: 160px; object-fit: cover;" %>
+              <% else %>
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
+                  <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                </div>
+              <% end %>
+              
+              <div class="card-body">
+                <h5 class="card-title mb-1"><%= fm.mountain.name %></h5>
+                <p class="text-muted mb-2">
+                  <i class="bi bi-flower1 me-1"></i><%= fm.flower.name %>
+                </p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-light text-dark">
+                    <%= fm.mountain.difficulty_level %>
+                  </span>
+                  
+                  <% days_left = fm.days_until_peak %>
+                  <% if days_left %>
+                    <span class="text-success fw-bold">あと<%= days_left %>日</span>
+                  <% else %>
+                    <span class="text-muted">時期未定</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-12">
+        <div class="card border-0 bg-light">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-geo-alt-fill text-muted mb-3" style="font-size: 2rem;"></i>
+            <h5>この地域のスポットはまだ登録されていません</h5>
+            <p class="text-muted">別の地域を選択してみましょう</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- 人気の投稿 -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-camera me-2"></i>人気の投稿</h3>
+    <%= link_to "すべて見る", posts_path(sort: "popular"), class: "btn btn-sm btn-outline-success" %>
+  </div>
+  
+  <div class="row">
+    <% if @popular_posts.any? %>
+      <% @popular_posts.each do |post| %>
+        <div class="col-md-4 mb-4">
+          <%= link_to post_path(post), class: "text-decoration-none" do %>
+            <div class="card border-0 shadow-sm h-100 hover-card">
+              <% if post.image_url.present? %>
+                <%= image_tag post.image_url, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
+              <% else %>
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                  <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                </div>
+              <% end %>
+              
+              <div class="card-body">
+                <h6 class="card-title mb-1">
+                  <%= post.flower_mountain.mountain.name %> - <%= post.flower_mountain.flower.name %>
+                </h6>
+                <p class="text-muted small mb-2">
+                  <i class="bi bi-person-circle me-1"></i><%= post.user.nickname %>
+                </p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-pink">
+                    <i class="bi bi-heart-fill me-1"></i><%= post.likes_count %>
+                  </span>
+                  <small class="text-muted">
+                    <%= l post.created_at, format: :short %>
+                  </small>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-12">
+        <div class="card border-0 bg-light">
+          <div class="card-body text-center py-5">
+            <i class="bi bi-camera text-muted mb-3" style="font-size: 2rem;"></i>
+            <h5>まだ投稿がありません</h5>
+            <p class="text-muted">あなたが最初の投稿者になりましょう！</p>
+            <%= link_to "投稿する", new_post_path, class: "btn btn-pink mt-2" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+<% else %>
+  <!-- 未ログインユーザー向けランディングページ -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm bg-gradient-green-pink">
+        <div class="card-body text-center py-5">
+          <h1 class="display-5 fw-bold text-white mb-3">見頃の花を見逃さない</h1>
+          <p class="lead text-white mb-4">
+            あなたの行きたいエリアの高山植物の開花時期を事前にお知らせ。<br>
+            忙しい日常でも、最高のタイミングで山の花に出会えます。
+          </p>
+          <%= link_to "今すぐ登録して通知を受け取る", new_user_registration_path, class: "btn btn-light btn-lg" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 機能紹介 -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <ul class="nav nav-tabs" id="featureTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map" type="button">
+            <i class="bi bi-map me-1"></i>花登山マップ
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="photos-tab" data-bs-toggle="tab" data-bs-target="#photos" type="button">
+            <i class="bi bi-camera me-1"></i>写真ランキング
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button">
+            <i class="bi bi-heart me-1"></i>お気に入り
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="filter-tab" data-bs-toggle="tab" data-bs-target="#filter" type="button">
+            <i class="bi bi-funnel me-1"></i>ルート検索
+          </button>
+        </li>
+      </ul>
+      
+      <div class="tab-content p-4 border border-top-0 rounded-bottom bg-white">
+        <div class="tab-pane fade show active" id="map" role="tabpanel">
+          <div class="text-center py-4">
+            <i class="bi bi-map-fill text-success mb-3" style="font-size: 3rem;"></i>
+            <h3 class="mb-3">花登山マップ</h3>
+            <p class="lead mb-4">
+              登山スポット×花の見頃を地図で表示。グラフでピーク時期が一目でわかります。<br>
+              お気に入りの山や花の場所をマップで確認し、最適なルートを計画できます。
+            </p>
+            <%= link_to "ログインして利用する", new_user_session_path, class: "btn btn-outline-success" %>
+          </div>
+        </div>
+        
+        <div class="tab-pane fade" id="photos" role="tabpanel">
+          <div class="text-center py-4">
+            <i class="bi bi-camera-fill text-pink mb-3" style="font-size: 3rem;"></i>
+            <h3 class="mb-3">写真ランキング</h3>
+            <p class="lead mb-4">
+              ユーザーがリアルタイムで投稿した写真で実際の花の様子がわかります。<br>
+              人気順・最新順でチェック可能。いいね機能で素敵な写真を応援しましょう。
+            </p>
+            <%= link_to "ログインして利用する", new_user_session_path, class: "btn btn-outline-success" %>
+          </div>
+        </div>
+        
+        <div class="tab-pane fade" id="favorites" role="tabpanel">
+          <div class="text-center py-4">
+            <i class="bi bi-heart-fill text-danger mb-3" style="font-size: 3rem;"></i>
+            <h3 class="mb-3">お気に入り保存</h3>
+            <p class="lead mb-4">
+              気に入った花の情報を簡単に登録でき、次回リマインドしてくれます。<br>
+              あなただけの特別な花スポットコレクションを作成しましょう。
+            </p>
+            <%= link_to "ログインして利用する", new_user_session_path, class: "btn btn-outline-success" %>
+          </div>
+        </div>
+        
+        <div class="tab-pane fade" id="filter" role="tabpanel">
+          <div class="text-center py-4">
+            <i class="bi bi-funnel-fill text-primary mb-3" style="font-size: 3rem;"></i>
+            <h3 class="mb-3">ルートフィルター</h3>
+            <p class="lead mb-4">
+              初心者向けの低山〜上級者向けの高山までレベル別にフィルターをかけて検索可能。<br>
+              あなたのレベルに合った最適な登山ルートを見つけましょう。
+            </p>
+            <%= link_to "ログインして利用する", new_user_session_path, class: "btn btn-outline-success" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- アプリの特徴 -->
+  <div class="row mb-5">
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
+          <div class="feature-icon bg-pink-light rounded-circle mx-auto mb-3">
+            <i class="bi bi-bell text-pink"></i>
+          </div>
+          <h4>開花リマインダー</h4>
+          <p class="text-muted">
+            事前に行きたいエリアを登録しておけば、見たい花の見頃を1ヶ月前などに通知。
+            開花までカウントダウンも表示します。
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
+          <div class="feature-icon bg-green-light rounded-circle mx-auto mb-3">
+            <i class="bi bi-camera text-success"></i>
+          </div>
+          <h4>リアルタイム投稿</h4>
+          <p class="text-muted">
+            ユーザーがリアルタイムで投稿した写真で実際の花の様子がわかります。
+            人気順・最新順でチェック可能です。
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
+          <div class="feature-icon bg-blue-light rounded-circle mx-auto mb-3">
+            <i class="bi bi-funnel text-primary"></i>
+          </div>
+          <h4>ルートフィルター</h4>
+          <p class="text-muted">
+            初心者向けの低山〜上級者向けの高山までレベル別にフィルターをかけて検索可能。
+            あなたに最適なルートが見つかります。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -1,2 +1,76 @@
-<h1>Notifications#new</h1>
-<p>Find me in app/views/notifications/new.html.erb</p>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="card-title mb-4"><i class="bi bi-bell me-2"></i>通知設定</h2>
+        
+        <% if @flower_mountain %>
+          <div class="alert alert-info mb-4">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <% if @flower_mountain.flower.image_url.present? %>
+                  <%= image_tag @flower_mountain.flower.image_url, 
+                      class: "rounded", style: "width: 60px; height: 60px; object-fit: cover;" %>
+                <% else %>
+                  <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                       style="width: 60px; height: 60px;">
+                    <i class="bi bi-flower1 text-muted" style="font-size: 1.5rem;"></i>
+                  </div>
+                <% end %>
+              </div>
+              
+              <div>
+                <h5 class="mb-1"><%= @flower_mountain.mountain.name %></h5>
+                <p class="mb-0">
+                  <i class="bi bi-flower1 me-1"></i><%= @flower_mountain.flower.name %>
+                  <span class="badge bg-light text-dark ms-2">
+                    <%= @flower_mountain.mountain.difficulty_level %>
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <%= form_with model: @notification, local: true do |f| %>
+          <% if @notification.errors.any? %>
+            <div class="alert alert-danger">
+              <h4><%= pluralize(@notification.errors.count, "error") %> prohibited this notification from being saved:</h4>
+              <ul>
+                <% @notification.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <% unless @flower_mountain %>
+            <div class="mb-3">
+              <%= f.label :flower_mountain_id, "花山スポット", class: "form-label" %>
+              <%= f.collection_select :flower_mountain_id, FlowerMountain.includes(:flower, :mountain).all, :id, 
+                  ->(fm) { "#{fm.mountain.name} - #{fm.flower.name}" }, 
+                  { selected: @flower_mountain_id, include_blank: "選択してください" }, 
+                  class: "form-select", required: true %>
+            </div>
+          <% else %>
+            <%= f.hidden_field :flower_mountain_id, value: @flower_mountain.id %>
+          <% end %>
+          
+          <div class="mb-4">
+            <%= f.label :days_before, "通知タイミング", class: "form-label" %>
+            <div class="input-group">
+              <%= f.number_field :days_before, class: "form-control", min: 1, max: 90, value: 30, required: true %>
+              <span class="input-group-text">日前</span>
+            </div>
+            <div class="form-text">見頃の何日前に通知を受け取るか設定してください</div>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <%= f.submit "通知を設定する", class: "btn btn-success btn-lg" %>
+            <%= link_to "キャンセル", :back, class: "btn btn-outline-secondary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
