@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  flower_mountain: one
+  content: MyText
+  image_url: MyString
+  likes_count: 1
+
+two:
+  user: two
+  flower_mountain: two
+  content: MyText
+  image_url: MyString
+  likes_count: 1

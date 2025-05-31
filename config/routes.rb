@@ -1,10 +1,23 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Deviseのユーザー認証関連のルーティング
+  devise_for :users
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Homeページのルーティング
+  root to: 'home#index'
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Usersの編集・表示関連
+  resources :users, only: [:show, :edit, :update]
+
+  # Postsのリソースに対するRESTfulルーティング
+  resources :posts, except: [:index] do
+    # postsリソース内の「お気に入り」アクションを追加する場合
+    resources :favorites, only: [:create, :destroy]
+  end
+
+  # 通知関連
+  resources :notifications, except: [:show]
+
+  # お気に入り関連
+  resources :favorites, only: [:index]
+
 end
