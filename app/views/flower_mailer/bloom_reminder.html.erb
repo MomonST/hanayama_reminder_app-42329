@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+    <style>
+      body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background: linear-gradient(135deg, #22c55e 0%, #ec4899 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+      }
+      .flower-info {
+        display: flex;
+        margin-bottom: 20px;
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+      }
+      .flower-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 15px;
+      }
+      .btn {
+        display: inline-block;
+        background: #22c55e;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 15px;
+      }
+      .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>花山リマインダー</h1>
+      <p>見頃の花をお知らせします</p>
+    </div>
+    
+    <div class="content">
+      <h2><%= @user.nickname || @user.email %>さん</h2>
+      
+      <p>
+        あなたが登録した「<%= @flower.name %>」の見頃まであと<strong><%= @days_left %>日</strong>です！
+      </p>
+      
+      <div class="flower-info">
+        <% if @flower.image_url.present? %>
+          <img src="<%= @flower.image_url %>" alt="<%= @flower.name %>" class="flower-image">
+        <% end %>
+        
+        <div>
+          <h3><%= @flower.name %></h3>
+          <p><strong>場所:</strong> <%= @mountain.name %> (<%= @mountain.region %>)</p>
+          <p><strong>見頃予想:</strong> <%= @flower_mountain.peak_month %>月中旬</p>
+          <p><strong>難易度:</strong> <%= @mountain.difficulty_level %></p>
+        </div>
+      </div>
+      
+      <p>
+        素敵な花との出会いのために、ぜひ計画を立ててみてください。
+        最新の開花情報は、アプリ内の写真投稿でも確認できます。
+      </p>
+      
+      <a href="<%= flower_mountain_url(@flower_mountain) %>" class="btn">
+        詳細を確認する
+      </a>
+    </div>
+    
+    <div class="footer">
+      <p>
+        ※このメールは自動送信されています。返信されても対応できません。<br>
+        通知設定の変更は<a href="<%= notifications_url %>">こちら</a>から行えます。
+      </p>
+      <p>&copy; 2024 花山リマインダー</p>
+    </div>
+  </body>
+</html>

@@ -83,3 +83,4 @@ gem 'bootstrap', '~> 5.1'
 gem 'bootstrap-icons'
 
 gem 'sassc-rails'               # Sassエンジン
+gem 'whenever', require: false  # スケジュール設定
