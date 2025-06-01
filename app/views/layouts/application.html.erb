@@ -1,41 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title>花山リマインダー</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>花山リマインダー - 見頃の花を見逃さない</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="あなたの行きたいエリアの高山植物の開花時期を事前にお知らせ。忙しい日常でも、最高のタイミングで山の花に出会えます。">
+    <meta name="keywords" content="花,山,登山,高山植物,開花,通知,リマインダー">
+    
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+    
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Stylesheets -->
+    <%= stylesheet_link_tag 'application', 'data-turbolinks-track': 'reload' %>
     
     <!-- Google Maps API -->
     <% if content_for?(:use_google_maps) %>
-      <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap" async defer></script>
+      <script>
+        window.mapData = <%= raw @map_data.to_json if defined?(@map_data) %>;
+      </script>
+      <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer></script>
     <% end %>
+    
+    <!-- JavaScript -->
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body class="gradient-bg">
+    <!-- ヘッダー -->
     <%= render 'shared/header' %>
     
+    <!-- 通知ポップアップ（ログイン前のみ） -->
+    <% unless user_signed_in? %>
+      <%= render 'shared/notification_popup' %>
+    <% end %>
+    
+    <!-- アラート表示エリア -->
+    <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+    
+    <!-- フラッシュメッセージ -->
     <% if notice %>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
         <%= notice %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <% end %>
     
     <% if alert %>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
         <%= alert %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <% end %>
     
-    <main class="container py-4">
+    <!-- メインコンテンツ -->
+    <main class="container-fluid px-3 px-md-4 py-4">
       <%= yield %>
     </main>
     
+    <!-- フッター -->
     <%= render 'shared/footer' %>
+    
+    <!-- ページトップボタン -->
+    <button id="page-top" class="btn btn-success position-fixed bottom-0 end-0 m-4 rounded-circle d-none" style="width: 50px; height: 50px; z-index: 1000;" onclick="smoothScrollTo('body')">
+      <i class="bi bi-arrow-up"></i>
+    </button>
+    
+    <script>
+      // ページトップボタンの表示制御
+      window.addEventListener('scroll', function() {
+        const pageTop = document.getElementById('page-top');
+        if (window.scrollY > 300) {
+          pageTop.classList.remove('d-none');
+        } else {
+          pageTop.classList.add('d-none');
+        }
+      });
+    </script>
   </body>
 </html>

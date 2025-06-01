@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   resources :favorites, only: [:index, :create, :destroy]
 
   # Postsのリソースに対するRESTfulルーティング
-  resources :posts, except: [:index] do
+  resources :posts do
     # postsリソース内の「いいね」アクションを追加
     resources :likes, only: [:create]
   end

@@ -1,29 +1,93 @@
-<h2>Sign up</h2>
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-lg">
+      <div class="card-body p-5">
+        <div class="text-center mb-4">
+          <i class="bi bi-flower1 text-success mb-3" style="font-size: 3rem;"></i>
+          <h2 class="text-gradient mb-2">新規登録</h2>
+          <p class="text-muted">花山リマインダーへようこそ</p>
+        </div>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "needs-validation", novalidate: true }) do |f| %>
+          <%= render 'shared/error_messages', object: resource %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+          <div class="mb-3">
+            <%= f.label :email, "メールアドレス", class: "form-label" %>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control", required: true %>
+            <div class="invalid-feedback">
+              有効なメールアドレスを入力してください
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :password, "パスワード", class: "form-label" %>
+            <%= f.password_field :password, autocomplete: "new-password", class: "form-control", required: true, minlength: 6 %>
+            <div class="form-text">6文字以上で入力してください</div>
+            <div class="invalid-feedback">
+              パスワードは6文字以上で入力してください
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :password_confirmation, "パスワード（確認）", class: "form-label" %>
+            <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control", required: true %>
+            <div class="invalid-feedback">
+              パスワードが一致しません
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :nickname, "ニックネーム", class: "form-label" %>
+            <%= f.text_field :nickname, class: "form-control", required: true %>
+            <div class="invalid-feedback">
+              ニックネームを入力してください
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-6">
+              <%= f.label :last_name, "姓", class: "form-label" %>
+              <%= f.text_field :last_name, class: "form-control" %>
+            </div>
+            <div class="col-6">
+              <%= f.label :first_name, "名", class: "form-label" %>
+              <%= f.text_field :first_name, class: "form-control" %>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-6">
+              <%= f.label :last_name_kana, "姓（カナ）", class: "form-label" %>
+              <%= f.text_field :last_name_kana, class: "form-control" %>
+            </div>
+            <div class="col-6">
+              <%= f.label :first_name_kana, "名（カナ）", class: "form-label" %>
+              <%= f.text_field :first_name_kana, class: "form-control" %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :birth_date, "生年月日", class: "form-label" %>
+            <%= f.date_field :birth_date, class: "form-control" %>
+          </div>
+
+          <div class="mb-4">
+            <%= f.label :region, "お住まいの地域", class: "form-label" %>
+            <%= f.select :region, User::REGIONS, { include_blank: "選択してください" }, { class: "form-select" } %>
+          </div>
+
+          <div class="d-grid mb-3">
+            <%= f.submit "アカウントを作成", class: "btn btn-success btn-lg" %>
+          </div>
+        <% end %>
+
+        <div class="text-center">
+          <p class="text-muted mb-0">
+            すでにアカウントをお持ちですか？
+            <%= link_to "ログイン", new_session_path(resource_name), class: "text-decoration-none" %>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
