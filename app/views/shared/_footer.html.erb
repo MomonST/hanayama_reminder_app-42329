@@ -1,0 +1,111 @@
+<footer class="bg-gradient-to-r from-green-800 to-green-900 text-white py-5 mt-5">
+  <div class="container">
+    <div class="row">
+      <!-- アプリ情報 -->
+      <div class="col-md-4 mb-4">
+        <div class="d-flex align-items-center mb-3">
+          <i class="bi bi-flower1 me-2" style="font-size: 1.5rem;"></i>
+          <h5 class="mb-0">花山リマインダー</h5>
+        </div>
+        <p class="text-light mb-3">
+          見頃の花を見逃さない。<br>
+          あなたの行きたいエリアの高山植物の開花時期を事前にお知らせします。
+        </p>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-light">
+            <i class="bi bi-twitter" style="font-size: 1.2rem;"></i>
+          </a>
+          <a href="#" class="text-light">
+            <i class="bi bi-instagram" style="font-size: 1.2rem;"></i>
+          </a>
+          <a href="#" class="text-light">
+            <i class="bi bi-facebook" style="font-size: 1.2rem;"></i>
+          </a>
+        </div>
+      </div>
+      
+      <!-- ナビゲーション -->
+      <div class="col-md-2 mb-4">
+        <h6 class="text-uppercase fw-bold mb-3">機能</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <%= link_to "花登山マップ", flower_mountains_path, class: "text-light text-decoration-none" %>
+          </li>
+          <li class="mb-2">
+            <%= link_to "写真ランキング", posts_path, class: "text-light text-decoration-none" %>
+          </li>
+          <% if user_signed_in? %>
+            <li class="mb-2">
+              <%= link_to "お気に入り", favorites_path, class: "text-light text-decoration-none" %>
+            </li>
+            <li class="mb-2">
+              <%= link_to "通知設定", notifications_path, class: "text-light text-decoration-none" %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      
+      <!-- サポート -->
+      <div class="col-md-3 mb-4">
+        <h6 class="text-uppercase fw-bold mb-3">サポート</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <%= link_to "使い方ガイド", "#", class: "text-light text-decoration-none" %>
+          </li>
+          <li class="mb-2">
+            <%= link_to "よくある質問", "#", class: "text-light text-decoration-none" %>
+          </li>
+          <li class="mb-2">
+            <%= link_to "お問い合わせ", "#", class: "text-light text-decoration-none" %>
+          </li>
+          <li class="mb-2">
+            <%= link_to "プライバシーポリシー", "#", class: "text-light text-decoration-none" %>
+          </li>
+          <li class="mb-2">
+            <%= link_to "利用規約", "#", class: "text-light text-decoration-none" %>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- 地域情報 -->
+      <div class="col-md-3 mb-4">
+        <h6 class="text-uppercase fw-bold mb-3">対応地域</h6>
+        <div class="row">
+          <div class="col-6">
+            <ul class="list-unstyled small">
+              <li class="mb-1">北海道</li>
+              <li class="mb-1">東北</li>
+              <li class="mb-1">関東</li>
+              <li class="mb-1">中部</li>
+            </ul>
+          </div>
+          <div class="col-6">
+            <ul class="list-unstyled small">
+              <li class="mb-1">近畿</li>
+              <li class="mb-1">中国</li>
+              <li class="mb-1">四国</li>
+              <li class="mb-1">九州</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <hr class="my-4 border-light opacity-25">
+    
+    <!-- コピーライト -->
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <p class="mb-0 small">
+          &copy; <%= Date.current.year %> 花山リマインダー. All rights reserved.
+        </p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <p class="mb-0 small text-light">
+          <i class="bi bi-heart-fill text-danger me-1"></i>
+          Made with love for mountain flower lovers
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>

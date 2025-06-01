@@ -79,8 +79,7 @@ gem 'carrierwave'               # ファイルアップロード
 gem 'mini_magick'               # 画像リサイズ
 
 # CSSフレームワーク
-gem 'bootstrap', '~> 5.1'
-gem 'bootstrap-icons'
+gem 'bootstrap', '~> 5.2.3'
 
 gem 'sassc-rails'               # Sassエンジン
 gem 'whenever', require: false  # スケジュール設定
