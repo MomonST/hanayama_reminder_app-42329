@@ -1,0 +1,94 @@
+// Bootstrap
+@import "bootstrap";
+@import "bootstrap-icons";
+
+// カスタムスタイル
+body {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+// グラデーション背景
+.gradient-bg {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #fce7f3 100%);
+}
+
+// ヘッダーのグラデーションテキスト
+.text-gradient {
+  background: linear-gradient(90deg, #22c55e, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+// カード hover エフェクト
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+// 特徴アイコン
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    font-size: 1.75rem;
+  }
+}
+
+// カラー
+.bg-pink-light {
+  background-color: #fce7f3;
+}
+
+.bg-green-light {
+  background-color: #dcfce7;
+}
+
+.bg-blue-light {
+  background-color: #dbeafe;
+}
+
+.text-pink {
+  color: #ec4899;
+}
+
+.border-pink {
+  border-color: #ec4899 !important;
+}
+
+// ボタン
+.btn-pink {
+  background-color: #ec4899;
+  border-color: #ec4899;
+  color: white;
+  
+  &:hover {
+    background-color: #db2777;
+    border-color: #db2777;
+    color: white;
+  }
+}
+
+// グラデーション背景
+.bg-gradient-green-pink {
+  background: linear-gradient(135deg, #22c55e 0%, #ec4899 100%);
+}
+
+// シャドウ hover
+.shadow-hover {
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+}
