@@ -48,6 +48,7 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem 'pry-rails'               # デバッグ用
+  gem 'dotenv-rails'            # 環境変数管理
 end
 
 group :development do
@@ -86,3 +87,7 @@ gem 'sassc-rails'               # Sassエンジン
 gem 'whenever', require: false  # スケジュール設定
 
 gem 'rails-i18n'                #日本語対応
+
+# API通信用
+gem 'httparty'
+gem 'faraday'
