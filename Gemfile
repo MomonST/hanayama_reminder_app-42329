@@ -80,6 +80,7 @@ gem 'mini_magick'               # 画像リサイズ
 
 # CSSフレームワーク
 gem 'bootstrap', '~> 5.2.3'
+gem 'bootstrap-icons'
 
 gem 'sassc-rails'               # Sassエンジン
 gem 'whenever', require: false  # スケジュール設定
