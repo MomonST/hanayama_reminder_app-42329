@@ -84,3 +84,5 @@ gem 'bootstrap-icons'
 
 gem 'sassc-rails'               # Sassエンジン
 gem 'whenever', require: false  # スケジュール設定
+
+gem 'rails-i18n'                #日本語対応

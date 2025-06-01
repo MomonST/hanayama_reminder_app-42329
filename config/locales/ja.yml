@@ -1,0 +1,33 @@
+ja:
+  date:
+    formats:
+      default: "%Y/%m/%d"
+      short: "%m/%d"
+      long: "%Y年%m月%d日"
+  time:
+    formats:
+      default: "%Y/%m/%d %H:%M"
+      short: "%m/%d %H:%M"
+      long: "%Y年%m月%d日 %H時%M分"
+  activerecord:
+    models:
+      user: "ユーザー"
+      flower: "花"
+      mountain: "山"
+      post: "投稿"
+    attributes:
+      user:
+        email: "メールアドレス"
+        password: "パスワード"
+        nickname: "ニックネーム"
+        first_name: "名"
+        last_name: "姓"
+        region: "地域"
+      flower:
+        name: "花の名前"
+      mountain:
+        name: "山の名前"
+        difficulty_level: "難易度"
+      post:
+        content: "内容"
+        image_url: "画像"
