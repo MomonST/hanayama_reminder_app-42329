@@ -39,7 +39,7 @@ gem "jbuilder"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Reduces boot times through caching; required in config/boot.rb
-gem "bootsnap", require: false          # CSSフレームワーク
+gem "bootsnap", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"          # 画像処理
@@ -77,3 +77,9 @@ gem 'jquery-rails'              # JavaScript
 gem 'kaminari'                  # ページネーション
 gem 'carrierwave'               # ファイルアップロード
 gem 'mini_magick'               # 画像リサイズ
+
+# CSSフレームワーク
+gem 'bootstrap', '~> 5.1'
+gem 'bootstrap-icons'
+
+gem 'sassc-rails'               # Sassエンジン
