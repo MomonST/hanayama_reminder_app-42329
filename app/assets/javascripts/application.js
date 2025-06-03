@@ -4,6 +4,11 @@
 //= require rails-ujs
 //= require turbolinks
 //= require_tree .
+import "@hotwired/turbo-rails"
+import "@hotwired/stimulus"
+import "controllers"
+import * as bootstrap from "bootstrap"
+import * as google from "googlemaps"
 
 // グローバル変数
 window.HanayamaReminder = {

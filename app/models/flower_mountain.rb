@@ -20,6 +20,21 @@ class FlowerMountain < ApplicationRecord
   def self.peak_in_month(month)
     where(peak_month: month)
   end
+
+  # 見頃の季節を返す
+  def peak_season
+    peak_month.present? ? "#{peak_month}月" : "情報なし"
+  end
+
+  # 花が見頃かどうか
+  def blooming_now?
+    flower.blooming_now?
+  end
+
+  # 山の難易度を返す
+  def difficulty_level
+    mountain.difficulty_level
+  end
   
   # 見頃までの残り日数を計算
   def days_until_peak

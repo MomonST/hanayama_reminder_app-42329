@@ -1,4 +1,5 @@
 source "https://rubygems.org"
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.2.0"
 
@@ -27,7 +28,7 @@ gem "stimulus-rails"
 gem "jbuilder"
 
 # Use Redis adapter to run Action Cable in production
-# gem "redis", ">= 4.0.1"
+gem "redis", ">= 4.0.1"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -48,6 +49,9 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem 'pry-rails'               # デバッグ用
+  gem 'dotenv-rails'            # 環境変数管理
+  gem "rspec-rails"
+  gem "factory_bot_rails"
 end
 
 group :development do
@@ -86,3 +90,10 @@ gem 'sassc-rails'               # Sassエンジン
 gem 'whenever', require: false  # スケジュール設定
 
 gem 'rails-i18n'                #日本語対応
+
+# API通信用
+gem 'httparty'
+gem 'faraday'
+
+# Geocoding
+gem "geocoder"

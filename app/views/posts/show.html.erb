@@ -1,2 +1,196 @@
-<h1>Posts#show</h1>
-<p>Find me in app/views/posts/show.html.erb</p>
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "ホーム", root_path %></li>
+      <li class="breadcrumb-item"><%= link_to "投稿一覧", posts_path %></li>
+      <li class="breadcrumb-item active" aria-current="page">投稿詳細</li>
+    </ol>
+  </nav>
+  
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="me-3">
+              <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-person text-secondary" style="font-size: 1.5rem;"></i>
+              </div>
+            </div>
+            <div>
+              <h5 class="mb-0"><%= @post.user.nickname %></h5>
+              <p class="text-muted small mb-0">
+                <%= l @post.created_at, format: :long %>
+                <% if @post.taken_at.present? %>
+                  <span class="ms-2">撮影日: <%= l @post.taken_at, format: :short %></span>
+                <% end %>
+              </p>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <p><%= @post.content %></p>
+          </div>
+          
+          <div class="position-relative mb-3">
+            <%= image_tag @post.image_url.presence || "/placeholder.svg?height=500&width=800", 
+                        class: "img-fluid rounded", 
+                        style: "width: 100%; object-fit: cover;" %>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <% if user_signed_in? %>
+                <%= link_to like_post_path(@post), method: :post, class: "like-button btn btn-outline-danger #{@is_liked ? 'liked' : ''}", data: { remote: true } do %>
+                  <i class="bi <%= @is_liked ? 'bi-heart-fill' : 'bi-heart' %>"></i>
+                  <span class="like-count"><%= @likes_count %></span>
+                <% end %>
+              <% else %>
+                <button class="btn btn-outline-danger" disabled>
+                  <i class="bi bi-heart"></i>
+                  <%= @likes_count %>
+                </button>
+              <% end %>
+            </div>
+            
+            <div>
+              <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#shareModal">
+                <i class="bi bi-share me-1"></i>共有
+              </button>
+              
+              <% if user_signed_in? && (current_user == @post.user || current_user.admin?) %>
+                <%= link_to edit_post_path(@post), class: "btn btn-outline-secondary ms-2" do %>
+                  <i class="bi bi-pencil me-1"></i>編集
+                <% end %>
+                
+                <%= link_to post_path(@post), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "btn btn-outline-danger ms-2" do %>
+                  <i class="bi bi-trash me-1"></i>削除
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4">
+      <!-- 花・山情報 -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">詳細情報</h5>
+        </div>
+        <div class="card-body">
+          <% if @post.flower.present? %>
+            <div class="mb-3">
+              <h6 class="mb-2"><i class="bi bi-flower1 text-pink me-2"></i>花</h6>
+              <div class="d-flex align-items-center">
+                <%= image_tag @post.flower.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower.name}", 
+                            class: "rounded me-2", 
+                            style: "width: 50px; height: 50px; object-fit: cover;" %>
+                <div>
+                  <h6 class="mb-0">
+                    <%= link_to @post.flower.name, flower_path(@post.flower), class: "text-decoration-none" %>
+                  </h6>
+                  <small class="text-muted">見頃: <%= @post.flower.blooming_season %></small>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+          <% if @post.mountain.present? %>
+            <div>
+              <h6 class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>山</h6>
+              <div class="d-flex align-items-center">
+                <%= image_tag @post.mountain.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.mountain.name}", 
+                            class: "rounded me-2", 
+                            style: "width: 50px; height: 50px; object-fit: cover;" %>
+                <div>
+                  <h6 class="mb-0">
+                    <%= link_to @post.mountain.name, mountain_path(@post.mountain), class: "text-decoration-none" %>
+                  </h6>
+                  <small class="text-muted">
+                    <%= @post.mountain.region %>
+                    <% if @post.mountain.elevation.present? %>
+                      <span class="ms-1"><%= @post.mountain.elevation %>m</span>
+                    <% end %>
+                  </small>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- 関連投稿 -->
+      <% if @related_posts.any? %>
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">関連投稿</h5>
+          </div>
+          <div class="card-body">
+            <% @related_posts.each do |post| %>
+              <div class="d-flex mb-3">
+                <%= link_to post_path(post) do %>
+                  <%= image_tag post.image_url.presence || "/placeholder.svg?height=60&width=60", 
+                              class: "rounded me-2", 
+                              style: "width: 60px; height: 60px; object-fit: cover;" %>
+                <% end %>
+                <div>
+                  <p class="mb-1 small">
+                    <%= truncate(post.content, length: 50) %>
+                  </p>
+                  <small class="text-muted">
+                    <%= post.user.nickname %> - <%= time_ago_in_words(post.created_at) %>前
+                  </small>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- 共有モーダル -->
+  <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shareModalLabel">共有する</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex justify-content-center gap-3 mb-3">
+            <a href="https://twitter.com/intent/tweet?url=<%= request.original_url %>&text=花山リマインダーで見つけた素敵な投稿" target="_blank" class="btn btn-outline-primary">
+              <i class="bi bi-twitter"></i> Twitter
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<%= request.original_url %>" target="_blank" class="btn btn-outline-primary">
+              <i class="bi bi-facebook"></i> Facebook
+            </a>
+            <a href="https://line.me/R/msg/text/?花山リマインダーで見つけた素敵な投稿%0D%0A<%= request.original_url %>" target="_blank" class="btn btn-outline-success">
+              <i class="bi bi-line"></i> LINE
+            </a>
+          </div>
+          
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" value="<%= request.original_url %>" id="share-url" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="copyShareUrl()">
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyShareUrl() {
+    const copyText = document.getElementById("share-url");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText.value);
+    
+    showAlert("URLをコピーしました", "success");
+  }
+</script>

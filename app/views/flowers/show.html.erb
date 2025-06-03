@@ -1,0 +1,291 @@
+<% content_for :use_google_maps, true %>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- メイン画像とタイトル -->
+    <div class="col-12 mb-4">
+      <div class="card border-0 shadow-lg overflow-hidden">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <%= image_tag @flower.image_url.presence || "/placeholder.svg?height=400&width=600&text=#{@flower.name}", 
+                         class: "img-fluid w-100", 
+                         style: "height: 400px; object-fit: cover;" %>
+          </div>
+          <div class="col-md-6">
+            <div class="card-body h-100 d-flex flex-column justify-content-center p-5">
+              <div class="mb-3">
+                <% if @flower.blooming_season.present? %>
+                  <span class="badge bg-success fs-6 mb-2"><%= @flower.blooming_season %></span>
+                <% end %>
+                <h1 class="display-6 text-gradient mb-2"><%= @flower.name %></h1>
+                <% if @flower.scientific_name.present? %>
+                  <p class="text-muted fs-5 mb-3">
+                    <em><%= @flower.scientific_name %></em>
+                  </p>
+                <% end %>
+              </div>
+              
+              <p class="lead mb-4"><%= @flower.description %></p>
+              
+              <div class="d-flex gap-3 mb-4">
+                <!-- いいねボタン -->
+                <% if user_signed_in? %>
+                  <%= link_to like_flower_path(@flower), 
+                             method: :post, 
+                             remote: true,
+                             class: "btn #{'btn-pink' if @is_liked} #{'btn-outline-pink' unless @is_liked} like-button",
+                             data: { method: 'post' } do %>
+                    <i class="bi bi-heart<%= '-fill' if @is_liked %> me-2"></i>
+                    いいね <span class="like-count">(<%= @likes_count %>)</span>
+                  <% end %>
+                <% else %>
+                  <%= link_to new_user_session_path, class: "btn btn-outline-pink" do %>
+                    <i class="bi bi-heart me-2"></i>
+                    いいね (<%= @likes_count %>)
+                  <% end %>
+                <% end %>
+                
+                <!-- シェアボタン -->
+                <button class="btn btn-outline-primary" onclick="shareFlower()">
+                  <i class="bi bi-share me-2"></i>
+                  シェア
+                </button>
+              </div>
+              
+              <div class="row g-3 text-center">
+                <div class="col-4">
+                  <div class="border rounded p-3">
+                    <h4 class="text-success mb-1"><%= @flower_mountains.count %></h4>
+                    <small class="text-muted">登山スポット</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="border rounded p-3">
+                    <h4 class="text-pink mb-1"><%= @recent_posts.count %></h4>
+                    <small class="text-muted">最近の投稿</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="border rounded p-3">
+                    <h4 class="text-primary mb-1"><%= @likes_count %></h4>
+                    <small class="text-muted">いいね数</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブメニュー -->
+  <ul class="nav nav-tabs mb-4" id="flowerTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="spots-tab" data-bs-toggle="tab" data-bs-target="#spots" type="button" role="tab">
+        <i class="bi bi-geo-alt me-2"></i>登山スポット
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-content" type="button" role="tab">
+        <i class="bi bi-map me-2"></i>地図
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab">
+        <i class="bi bi-camera me-2"></i>投稿写真
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+        <i class="bi bi-info-circle me-2"></i>詳細情報
+      </button>
+    </li>
+  </ul>
+
+  <!-- タブコンテンツ -->
+  <div class="tab-content" id="flowerTabsContent">
+    <!-- 登山スポット -->
+    <div class="tab-pane fade show active" id="spots" role="tabpanel">
+      <div class="row">
+        <% if @flower_mountains.any? %>
+          <% @flower_mountains.each do |flower_mountain| %>
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card border-0 shadow-sm hover-card h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title mb-0">
+                      <%= link_to flower_mountain.mountain.name, 
+                                 mountain_path(flower_mountain.mountain), 
+                                 class: "text-decoration-none" %>
+                    </h5>
+                    <span class="badge bg-<%= flower_mountain.difficulty_level == '初心者' ? 'success' : flower_mountain.difficulty_level == '中級者' ? 'warning' : 'danger' %>">
+                      <%= flower_mountain.difficulty_level %>
+                    </span>
+                  </div>
+                  
+                  <p class="text-muted mb-3">
+                    <i class="bi bi-geo-alt me-1"></i>
+                    <%= flower_mountain.mountain.region %>
+                  </p>
+                  
+                  <% if flower_mountain.peak_period.present? %>
+                    <p class="mb-3">
+                      <strong>見頃:</strong> <%= flower_mountain.peak_period %>
+                    </p>
+                  <% end %>
+                  
+                  <% if flower_mountain.days_until_peak && flower_mountain.days_until_peak > 0 %>
+                    <div class="alert alert-success py-2 mb-3">
+                      <i class="bi bi-clock me-1"></i>
+                      見頃まで <strong><%= flower_mountain.days_until_peak %>日</strong>
+                    </div>
+                  <% end %>
+                  
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      投稿: <%= flower_mountain.posts.count %>件
+                    </small>
+                    <%= link_to "詳細", mountain_path(flower_mountain.mountain), 
+                               class: "btn btn-outline-success btn-sm" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="col-12">
+            <div class="text-center py-5">
+              <i class="bi bi-mountain text-muted mb-3" style="font-size: 4rem;"></i>
+              <h3 class="text-muted">登山スポット情報がありません</h3>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 地図 -->
+    <div class="tab-pane fade" id="map-content" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div id="map" style="height: 500px; width: 100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 投稿写真 -->
+    <div class="tab-pane fade" id="posts" role="tabpanel">
+      <div class="row">
+        <% if @recent_posts.any? %>
+          <% @recent_posts.each do |post| %>
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+              <div class="card border-0 shadow-sm hover-card">
+                <%= image_tag post.image_url.presence || "/placeholder.svg?height=200&width=200", 
+                             class: "card-img-top", 
+                             style: "height: 200px; object-fit: cover;" %>
+                <div class="card-body p-3">
+                  <p class="card-text small mb-2">
+                    <%= truncate(post.content, length: 50) %>
+                  </p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <%= post.user.nickname %>
+                    </small>
+                    <small class="text-muted">
+                      <%= time_ago_in_words(post.created_at) %>前
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="col-12">
+            <div class="text-center py-5">
+              <i class="bi bi-camera text-muted mb-3" style="font-size: 4rem;"></i>
+              <h3 class="text-muted mb-3">投稿写真がありません</h3>
+              <% if user_signed_in? %>
+                <%= link_to "写真を投稿する", new_post_path(flower_id: @flower.id), 
+                           class: "btn btn-success" %>
+              <% else %>
+                <%= link_to "ログインして投稿する", new_user_session_path, 
+                           class: "btn btn-outline-success" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 詳細情報 -->
+    <div class="tab-pane fade" id="info" role="tabpanel">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-4">花の特徴</h5>
+              
+              <% if @flower.characteristics.present? %>
+                <p class="mb-4"><%= simple_format(@flower.characteristics) %></p>
+              <% end %>
+              
+              <% if @flower.habitat.present? %>
+                <h6 class="mb-3">生息環境</h6>
+                <p class="mb-4"><%= simple_format(@flower.habitat) %></p>
+              <% end %>
+              
+              <% if @flower.peak_period.present? %>
+                <h6 class="mb-3">見頃時期</h6>
+                <p class="mb-4"><%= @flower.peak_period %></p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-4">関連する花</h5>
+              <% if @related_flowers.any? %>
+                <% @related_flowers.each do |related_flower| %>
+                  <div class="d-flex align-items-center mb-3">
+                    <%= image_tag related_flower.image_url.presence || "/placeholder.svg?height=60&width=60", 
+                                 class: "rounded me-3", 
+                                 style: "width: 60px; height: 60px; object-fit: cover;" %>
+                    <div>
+                      <h6 class="mb-1">
+                        <%= link_to related_flower.name, flower_path(related_flower), 
+                                   class: "text-decoration-none" %>
+                      </h6>
+                      <small class="text-muted"><%= related_flower.blooming_season %></small>
+                    </div>
+                  </div>
+                <% end %>
+              <% else %>
+                <p class="text-muted">関連する花がありません</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // シェア機能
+  function shareFlower() {
+    if (navigator.share) {
+      navigator.share({
+        title: '<%= @flower.name %> - 花山リマインダー',
+        text: '<%= @flower.description %>',
+        url: window.location.href
+      });
+    } else {
+      // フォールバック: URLをクリップボードにコピー
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showAlert('URLをクリップボードにコピーしました', 'success');
+      });
+    }
+  }
+</script>

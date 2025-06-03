@@ -14,11 +14,12 @@ class User < ApplicationRecord
   
   # バリデーション
   validates :email, presence: true, uniqueness: true
-  validates :nickname, presence: true, length: { maximum: 50 }, on: :update
+  validates :nickname, presence: true, length: { maximum: 50 }
   
   # 地域の選択肢
   REGIONS = ["北海道", "東北", "関東", "中部", "近畿", "中国", "四国", "九州"]
-  
+  validates :region, inclusion: { in: REGIONS }, allow_nil: true
+
   # ユーザーのフルネーム取得
   def full_name
     "#{last_name} #{first_name}"

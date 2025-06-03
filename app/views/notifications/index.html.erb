@@ -1,2 +1,105 @@
-<h1>Notifications#index</h1>
-<p>Find me in app/views/notifications/index.html.erb</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h3 text-gradient mb-0">
+          <i class="bi bi-bell me-2"></i>通知一覧
+        </h1>
+        
+        <% if @notifications.any? %>
+          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#clearAllModal">
+            <i class="bi bi-trash me-1"></i>
+            すべて削除
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-10 col-lg-8 mx-auto">
+      <% if @notifications.any? %>
+        <div class="card border-0 shadow-sm">
+          <div class="list-group list-group-flush">
+            <% @notifications.each do |notification| %>
+              <div class="list-group-item list-group-item-action p-3 <%= 'bg-light' unless notification.read %>">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <div class="bg-<%= notification.color %> bg-opacity-25 rounded-circle p-2">
+                        <i class="bi bi-<%= notification.icon_type %> text-<%= notification.color %>"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-1"><%= notification.title %></h6>
+                      <p class="mb-1 text-muted"><%= notification.message %></p>
+                      <small class="text-muted">
+                        <%= l notification.created_at, format: :short %>
+                      </small>
+                    </div>
+                  </div>
+                  
+                  <div class="d-flex">
+                    <% if notification.url.present? %>
+                      <%= link_to notification.url, class: "btn btn-sm btn-outline-primary me-2" do %>
+                        <i class="bi bi-arrow-right"></i>
+                      <% end %>
+                    <% end %>
+                    
+                    <%= link_to notification_path(notification), 
+                               method: :delete, 
+                               data: { confirm: "この通知を削除しますか？" }, 
+                               class: "btn btn-sm btn-outline-danger" do %>
+                      <i class="bi bi-trash"></i>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- ページネーション -->
+        <% if @notifications.respond_to?(:current_page) %>
+          <div class="d-flex justify-content-center mt-4">
+            <%= paginate @notifications, theme: 'bootstrap_5' %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-5">
+          <div class="bg-light rounded-circle p-4 d-inline-block mb-4">
+            <i class="bi bi-bell text-muted" style="font-size: 3rem;"></i>
+          </div>
+          <h3 class="text-muted mb-3">通知はありません</h3>
+          <p class="text-muted mb-4">
+            新しい通知が届くとここに表示されます
+          </p>
+          <%= link_to "ホームに戻る", root_path, class: "btn btn-success" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 全削除確認モーダル -->
+<% if @notifications.any? %>
+  <div class="modal fade" id="clearAllModal" tabindex="-1" aria-labelledby="clearAllModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="clearAllModalLabel">通知の削除確認</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>すべての通知を削除しますか？この操作は取り消せません。</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+          <%= link_to "すべて削除", clear_all_notifications_path, 
+                     method: :delete, 
+                     class: "btn btn-danger" %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
