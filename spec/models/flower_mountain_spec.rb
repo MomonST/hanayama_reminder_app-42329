@@ -3,28 +3,28 @@ require 'rails_helper'
 RSpec.describe FlowerMountain, type: :model do
   describe 'バリデーション' do
     it 'ファクトリが有効であること' do
-      expect(build(:flower_mountain)).to be_valid
+      expect(FactoryBot.build(:flower_mountain)).to be_valid
     end
 
     it 'peak_monthが有効な値であること' do
       (1..12).each do |month|
-        flower_mountain = build(:flower_mountain, peak_month: month)
+        flower_mountain = FactoryBot.build(:flower_mountain, peak_month: month)
         expect(flower_mountain).to be_valid
       end
 
-      flower_mountain = build(:flower_mountain, peak_month: 0)
+      flower_mountain = FactoryBot.build(:flower_mountain, peak_month: 0)
       expect(flower_mountain).not_to be_valid
 
-      flower_mountain = build(:flower_mountain, peak_month: 13)
+      flower_mountain = FactoryBot.build(:flower_mountain, peak_month: 13)
       expect(flower_mountain).not_to be_valid
     end
 
     it 'flower_idとmountain_idの組み合わせが一意であること' do
-      flower = create(:flower)
-      mountain = create(:mountain)
-      create(:flower_mountain, flower: flower, mountain: mountain)
+      flower = FactoryBot.create(:flower)
+      mountain = FactoryBot.create(:mountain)
+      FactoryBot.create(:flower_mountain, flower: flower, mountain: mountain)
       
-      duplicate = build(:flower_mountain, flower: flower, mountain: mountain)
+      duplicate = FactoryBot.build(:flower_mountain, flower: flower, mountain: mountain)
       expect(duplicate).not_to be_valid
     end
   end
@@ -57,7 +57,7 @@ RSpec.describe FlowerMountain, type: :model do
   end
 
   describe 'メソッド' do
-    let(:flower_mountain) { create(:flower_mountain, peak_month: 4) }
+    let(:flower_mountain) { FactoryBot.create(:flower_mountain, peak_month: 4) }
 
     describe '#peak_season' do
       it '見頃の季節を返すこと' do
@@ -93,8 +93,8 @@ RSpec.describe FlowerMountain, type: :model do
 
     describe '#difficulty_level' do
       it '山の難易度を返すこと' do
-        mountain = create(:mountain, difficulty_level: '中級者')
-        flower_mountain = create(:flower_mountain, mountain: mountain)
+        mountain = FactoryBot.create(:mountain, difficulty_level: '中級者')
+        flower_mountain = FactoryBot.create(:flower_mountain, mountain: mountain)
         expect(flower_mountain.difficulty_level).to eq '中級者'
       end
     end
