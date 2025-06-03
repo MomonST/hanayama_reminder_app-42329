@@ -1,0 +1,442 @@
+<% content_for :use_google_maps, true %>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- メイン画像とタイトル -->
+    <div class="col-12 mb-4">
+      <div class="card border-0 shadow-lg overflow-hidden">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <%= image_tag @mountain.image_url.presence || "/placeholder.svg?height=400&width=600&text=#{@mountain.name}", 
+                         class: "img-fluid w-100", 
+                         style: "height: 400px; object-fit: cover;" %>
+          </div>
+          <div class="col-md-6">
+            <div class="card-body h-100 d-flex flex-column justify-content-center p-5">
+              <div class="mb-3">
+                <% if @mountain.region.present? %>
+                  <span class="badge bg-primary fs-6 mb-2"><%= @mountain.region %></span>
+                <% end %>
+                <h1 class="display-6 text-gradient mb-2"><%= @mountain.name %></h1>
+                <% if @mountain.elevation.present? %>
+                  <p class="text-muted fs-5 mb-3">
+                    標高: <%= @mountain.elevation %>m
+                  </p>
+                <% end %>
+              </div>
+              
+              <p class="lead mb-4"><%= @mountain.description %></p>
+              
+              <div class="d-flex gap-3 mb-4">
+                <!-- カレンダーに追加ボタン -->
+                <% if user_signed_in? %>
+                  <button class="btn btn-success" onclick="addToCalendar()">
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    カレンダーに追加
+                  </button>
+                <% else %>
+                  <%= link_to new_user_session_path, class: "btn btn-outline-success" do %>
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    カレンダーに追加
+                  <% end %>
+                <% end %>
+                
+                <!-- シェアボタン -->
+                <button class="btn btn-outline-primary" onclick="shareMountain()">
+                  <i class="bi bi-share me-2"></i>
+                  シェア
+                </button>
+              </div>
+              
+              <div class="row g-3 text-center">
+                <div class="col-4">
+                  <div class="border rounded p-3">
+                    <h4 class="text-success mb-1"><%= @flower_mountains.count %></h4>
+                    <small class="text-muted">花の種類</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="border rounded p-3">
+                    <h4 class="text-pink mb-1"><%= @blooming_now.count %></h4>
+                    <small class="text-muted">現在見頃</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="border rounded p-3">
+                    <h4 class="text-primary mb-1"><%= @recent_posts.count %></h4>
+                    <small class="text-muted">投稿数</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブメニュー -->
+  <ul class="nav nav-tabs mb-4" id="mountainTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="flowers-tab" data-bs-toggle="tab" data-bs-target="#flowers" type="button" role="tab">
+        <i class="bi bi-flower1 me-2"></i>見られる花
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-content" type="button" role="tab">
+        <i class="bi bi-map me-2"></i>地図・アクセス
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab">
+        <i class="bi bi-camera me-2"></i>投稿写真
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+        <i class="bi bi-info-circle me-2"></i>登山情報
+      </button>
+    </li>
+  </ul>
+
+  <!-- タブコンテンツ -->
+  <div class="tab-content" id="mountainTabsContent">
+    <!-- 見られる花 -->
+    <div class="tab-pane fade show active" id="flowers" role="tabpanel">
+      <div class="row">
+        <% if @flower_mountains.any? %>
+          <% @flower_mountains.each do |flower_mountain| %>
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card border-0 shadow-sm hover-card h-100">
+                <div class="position-relative">
+                  <%= image_tag flower_mountain.flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{flower_mountain.flower.name}", 
+                              class: "card-img-top", 
+                              style: "height: 200px; object-fit: cover;" %>
+                  
+                  <!-- 季節バッジ -->
+                  <% if flower_mountain.flower.blooming_season.present? %>
+                    <span class="badge bg-success position-absolute top-0 end-0 m-2">
+                      <%= flower_mountain.flower.blooming_season %>
+                    </span>
+                  <% end %>
+                  
+                  <!-- 難易度バッジ -->
+                  <span class="badge bg-<%= flower_mountain.difficulty_level == '初心者' ? 'success' : flower_mountain.difficulty_level == '中級者' ? 'warning' : 'danger' %> position-absolute top-0 start-0 m-2">
+                    <%= flower_mountain.difficulty_level %>
+                  </span>
+                </div>
+                
+                <div class="card-body">
+                  <h5 class="card-title mb-2">
+                    <%= link_to flower_mountain.flower.name, flower_path(flower_mountain.flower), 
+                              class: "text-decoration-none text-dark" %>
+                  </h5>
+                  
+                  <% if flower_mountain.flower.scientific_name.present? %>
+                    <p class="text-muted small mb-2">
+                      <em><%= flower_mountain.flower.scientific_name %></em>
+                    </p>
+                  <% end %>
+                  
+                  <% if flower_mountain.peak_period.present? %>
+                    <p class="mb-3">
+                      <strong>見頃:</strong> <%= flower_mountain.peak_period %>
+                    </p>
+                  <% end %>
+                  
+                  <% if flower_mountain.days_until_peak && flower_mountain.days_until_peak > 0 %>
+                    <div class="alert alert-success py-2 mb-3">
+                      <i class="bi bi-clock me-1"></i>
+                      見頃まで <strong><%= flower_mountain.days_until_peak %>日</strong>
+                    </div>
+                  <% elsif flower_mountain.flower.blooming_now? %>
+                    <div class="alert alert-pink py-2 mb-3">
+                      <i class="bi bi-flower1 me-1"></i>
+                      <strong>現在見頃です！</strong>
+                    </div>
+                  <% end %>
+                  
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      投稿: <%= flower_mountain.posts.count %>件
+                    </small>
+                    <%= link_to "詳細", flower_path(flower_mountain.flower), 
+                              class: "btn btn-outline-success btn-sm" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="col-12">
+            <div class="text-center py-5">
+              <i class="bi bi-flower1 text-muted mb-3" style="font-size: 4rem;"></i>
+              <h3 class="text-muted">花の情報がありません</h3>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 地図・アクセス -->
+    <div class="tab-pane fade" id="map-content" role="tabpanel">
+      <div class="row">
+        <div class="col-md-8 mb-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+              <div id="map" style="height: 500px; width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title mb-4">アクセス情報</h5>
+              
+              <% if @mountain.access_info.present? %>
+                <p class="mb-4"><%= simple_format(@mountain.access_info) %></p>
+              <% else %>
+                <p class="text-muted">アクセス情報がありません</p>
+              <% end %>
+              
+              <% if @mountain.latitude.present? && @mountain.longitude.present? %>
+                <div class="d-grid">
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=<%= @mountain.latitude %>,<%= @mountain.longitude %>" 
+                     target="_blank" 
+                     class="btn btn-outline-primary">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    ルート検索
+                  </a>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 近くの山 -->
+      <% if @nearby_mountains.any? %>
+        <div class="row">
+          <div class="col-12 mb-3">
+            <h5>近くの山</h5>
+          </div>
+          
+          <% @nearby_mountains.each do |nearby| %>
+            <div class="col-md-4 mb-4">
+              <div class="card border-0 shadow-sm hover-card">
+                <div class="row g-0">
+                  <div class="col-4">
+                    <%= image_tag nearby.image_url.presence || "/placeholder.svg?height=100&width=100", 
+                                class: "img-fluid rounded-start", 
+                                style: "height: 100%; object-fit: cover;" %>
+                  </div>
+                  <div class="col-8">
+                    <div class="card-body">
+                      <h6 class="card-title mb-1">
+                        <%= link_to nearby.name, mountain_path(nearby), 
+                                  class: "text-decoration-none" %>
+                      </h6>
+                      <p class="card-text small text-muted mb-2">
+                        <%= nearby.region %> / <%= nearby.elevation %>m
+                      </p>
+                      <small class="text-muted">
+                        <i class="bi bi-flower1 me-1"></i>
+                        <%= nearby.flowers.count %>種の花
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- 投稿写真 -->
+    <div class="tab-pane fade" id="posts" role="tabpanel">
+      <div class="row">
+        <% if @recent_posts.any? %>
+          <% @recent_posts.each do |post| %>
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+              <div class="card border-0 shadow-sm hover-card">
+                <%= image_tag post.image_url.presence || "/placeholder.svg?height=200&width=200", 
+                            class: "card-img-top", 
+                            style: "height: 200px; object-fit: cover;" %>
+                <div class="card-body p-3">
+                  <p class="card-text small mb-2">
+                    <%= truncate(post.content, length: 50) %>
+                  </p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <%= post.user.nickname %>
+                    </small>
+                    <small class="text-muted">
+                      <%= time_ago_in_words(post.created_at) %>前
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="col-12">
+            <div class="text-center py-5">
+              <i class="bi bi-camera text-muted mb-3" style="font-size: 4rem;"></i>
+              <h3 class="text-muted mb-3">投稿写真がありません</h3>
+              <% if user_signed_in? %>
+                <%= link_to "写真を投稿する", new_post_path(mountain_id: @mountain.id), 
+                          class: "btn btn-success" %>
+              <% else %>
+                <%= link_to "ログインして投稿する", new_user_session_path, 
+                          class: "btn btn-outline-success" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 登山情報 -->
+    <div class="tab-pane fade" id="info" role="tabpanel">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title mb-4">登山ルート情報</h5>
+              
+              <% if @mountain.trail_info.present? %>
+                <p class="mb-4"><%= simple_format(@mountain.trail_info) %></p>
+              <% else %>
+                <p class="text-muted">登山ルート情報がありません</p>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- 注意事項 -->
+          <div class="card border-0 shadow-sm mb-4 border-warning">
+            <div class="card-body">
+              <h5 class="card-title text-warning mb-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                登山の注意事項
+              </h5>
+              
+              <ul class="mb-0">
+                <li class="mb-2">天候の急変に備え、防寒具や雨具を必ず持参してください。</li>
+                <li class="mb-2">単独登山は避け、行動予定を必ず誰かに伝えましょう。</li>
+                <li class="mb-2">携帯電話の電波が届かない場所もあります。</li>
+                <li class="mb-2">高山植物は観察のみとし、採取は絶対にしないでください。</li>
+                <li>ゴミは必ず持ち帰りましょう。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <!-- 山の基本情報 -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title mb-4">基本情報</h5>
+              
+              <table class="table table-borderless">
+                <tbody>
+                  <tr>
+                    <th scope="row" class="ps-0">名称</th>
+                    <td><%= @mountain.name %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="ps-0">地域</th>
+                    <td><%= @mountain.region %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="ps-0">標高</th>
+                    <td><%= @mountain.elevation %>m</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="ps-0">花の種類</th>
+                    <td><%= @flower_mountains.count %>種</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="ps-0">現在見頃</th>
+                    <td><%= @blooming_now.count %>種</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- 天気情報 -->
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-4">天気情報</h5>
+              
+              <div class="text-center py-3">
+                <p class="text-muted">
+                  <i class="bi bi-cloud-sun fs-1 mb-3"></i><br>
+                  天気情報は準備中です
+                </p>
+                <% if user_signed_in? %>
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-bell me-1"></i>
+                    天気通知を設定
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // シェア機能
+  function shareMountain() {
+    if (navigator.share) {
+      navigator.share({
+        title: '<%= @mountain.name %> - 花山リマインダー',
+        text: '<%= @mountain.description %>',
+        url: window.location.href
+      });
+    } else {
+      // フォールバック: URLをクリップボードにコピー
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showAlert('URLをクリップボードにコピーしました', 'success');
+      });
+    }
+  }
+  
+  // カレンダーに追加
+  function addToCalendar() {
+    <% if user_signed_in? %>
+      // 現在見頃の花があれば、その情報を含める
+      <% if @blooming_now.any? %>
+        const title = '<%= @mountain.name %> 登山';
+        const desc = '現在見頃の花: <%= @blooming_now.map(&:name).join(", ") %>';
+        const url = window.location.href;
+        
+        // 2週間後の日付を設定
+        const twoWeeksLater = new Date();
+        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+        const year = twoWeeksLater.getFullYear();
+        const month = String(twoWeeksLater.getMonth() + 1).padStart(2, '0');
+        const day = String(twoWeeksLater.getDate()).padStart(2, '0');
+        
+        const startDate = `${year}${month}${day}`;
+        const endDate = startDate;
+        
+        const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(desc + '\n\n' + url)}`;
+        
+        window.open(googleCalUrl, '_blank');
+        showAlert('Googleカレンダーが開きました。日程を調整してください。', 'success');
+      <% else %>
+        showAlert('カレンダーに追加する日程を選択してください', 'info');
+        // TODO: 日程選択モーダルを表示
+      <% end %>
+    <% else %>
+      window.location.href = '<%= new_user_session_path %>';
+    <% end %>
+  }
+</script>

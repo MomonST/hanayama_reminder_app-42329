@@ -15,7 +15,8 @@ class HomeController < ApplicationController
     @flower_mountains = FlowerMountain.joins(:mountain)
                                      .where(mountains: { region: @region })
                                      .includes(:flower, :mountain)
-                                     .order("ABS(peak_month - #{Date.today.month})")
+                                     .select('flower_mountains.*, mountains.difficulty_level, ABS(peak_month - 6) AS days_until_peak')
+                                     .order(Arel.sql('ABS(peak_month - 6)'))
                                      .limit(6)
     
     # 通知設定済みの花山情報を取得
@@ -26,6 +27,35 @@ class HomeController < ApplicationController
     
     # 人気の投稿を取得
     @popular_posts = Post.popular.includes(:user, flower_mountain: [:flower, :mountain]).limit(3)
+
+    # 現在見頃の花
+    @blooming_flowers = Flower.blooming_now.limit(4)
+
+    # 人気の山
+    @popular_mountains = Mountain.left_joins(:posts)
+                                .group(:id)
+                                .order('COUNT(posts.id) DESC')
+                                .limit(3)
+
+    # 最新の投稿
+    @recent_posts = Post.includes(:user, :flower, :mountain)
+                        .recent
+                        .limit(6)
+
+    # 地域別の山の数
+    @regions_count = Mountain.group(:region)
+                             .count
+                             .sort_by { |_, count| -count }
+                             .first(5)
+                             .to_h
+    
+    # ログインしている場合は未読通知を取得
+    if user_signed_in?
+      @unread_notifications = current_user.notifications
+                                           .unread
+                                           .recent
+                                           .limit(5)
+    end
   end
   
   def about

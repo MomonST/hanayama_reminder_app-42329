@@ -1,0 +1,198 @@
+<div class="container-fluid">
+  <!-- ヘッダーセクション -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="text-center mb-4">
+        <h1 class="display-5 text-gradient mb-3">🌸 花図鑑</h1>
+        <p class="lead text-muted">
+          高山植物の美しい花々を探索しましょう
+        </p>
+      </div>
+      
+      <!-- 統計情報 -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-green-light text-center">
+            <div class="card-body py-3">
+              <h3 class="text-success mb-1"><%= @total_flowers %></h3>
+              <small class="text-muted">登録花数</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-pink-light text-center">
+            <div class="card-body py-3">
+              <h3 class="text-pink mb-1"><%= @blooming_now %></h3>
+              <small class="text-muted">見頃の花</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-blue-light text-center">
+            <div class="card-body py-3">
+              <h3 class="text-primary mb-1"><%= @regions.count %></h3>
+              <small class="text-muted">対応地域</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-warning bg-opacity-25 text-center">
+            <div class="card-body py-3">
+              <h3 class="text-warning mb-1"><%= @seasons.count %></h3>
+              <small class="text-muted">開花時期</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 検索・フィルターセクション -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <%= form_with url: flowers_path, method: :get, local: true, class: "row g-3" do |f| %>
+            <div class="col-md-3">
+              <%= f.text_field :search, placeholder: "花の名前で検索", 
+                              value: params[:search], 
+                              class: "form-control" %>
+            </div>
+            <div class="col-md-2">
+              <%= f.select :blooming_season, 
+                          options_for_select([['すべての季節', '']] + @seasons.map { |s| [s, s] }, params[:blooming_season]),
+                          {}, { class: "form-select" } %>
+            </div>
+            <div class="col-md-2">
+              <%= f.select :region, 
+                          options_for_select([['すべての地域', '']] + @regions.map { |r| [r, r] }, params[:region]),
+                          {}, { class: "form-select" } %>
+            </div>
+            <div class="col-md-2">
+              <%= f.select :difficulty, 
+                          options_for_select([
+                            ['すべての難易度', ''],
+                            ['初心者', '初心者'],
+                            ['中級者', '中級者'],
+                            ['上級者', '上級者']
+                          ], params[:difficulty]),
+                          {}, { class: "form-select" } %>
+            </div>
+            <div class="col-md-2">
+              <%= f.select :sort, 
+                          options_for_select([
+                            ['名前順', 'name'],
+                            ['季節順', 'season'],
+                            ['人気順', 'popular']
+                          ], params[:sort]),
+                          {}, { class: "form-select" } %>
+            </div>
+            <div class="col-md-1">
+              <%= f.submit "検索", class: "btn btn-success w-100" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 花一覧 -->
+  <div class="row">
+    <% if @flowers.any? %>
+      <% @flowers.each do |flower| %>
+        <div class="col-6 col-md-4 col-lg-3 mb-4">
+          <div class="card border-0 shadow-sm hover-card h-100">
+            <div class="position-relative">
+              <%= image_tag flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{flower.name}", 
+                           class: "card-img-top", 
+                           style: "height: 200px; object-fit: cover;" %>
+              
+              <!-- 季節バッジ -->
+              <% if flower.blooming_season.present? %>
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">
+                  <%= flower.blooming_season %>
+                </span>
+              <% end %>
+              
+              <!-- いいねボタン -->
+              <% if user_signed_in? %>
+                <%= link_to like_flower_path(flower), 
+                           method: :post, 
+                           remote: true,
+                           class: "btn btn-sm btn-light position-absolute bottom-0 end-0 m-2 like-button #{'liked' if current_user.likes.exists?(flower: flower)}",
+                           data: { method: 'post' } do %>
+                  <i class="bi bi-heart<%= '-fill' if current_user.likes.exists?(flower: flower) %>"></i>
+                  <span class="like-count"><%= flower.likes.count %></span>
+                <% end %>
+              <% else %>
+                <span class="btn btn-sm btn-light position-absolute bottom-0 end-0 m-2">
+                  <i class="bi bi-heart"></i>
+                  <span><%= flower.likes.count %></span>
+                </span>
+              <% end %>
+            </div>
+            
+            <div class="card-body">
+              <h5 class="card-title mb-2">
+                <%= link_to flower.name, flower_path(flower), 
+                           class: "text-decoration-none text-dark" %>
+              </h5>
+              
+              <% if flower.scientific_name.present? %>
+                <p class="text-muted small mb-2">
+                  <em><%= flower.scientific_name %></em>
+                </p>
+              <% end %>
+              
+              <p class="card-text small text-muted mb-3">
+                <%= truncate(flower.description, length: 80) %>
+              </p>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                  <i class="bi bi-geo-alt"></i>
+                  <%= flower.mountains.count %>箇所
+                </small>
+                <%= link_to "詳細", flower_path(flower), 
+                           class: "btn btn-outline-success btn-sm" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="bi bi-flower1 text-muted mb-3" style="font-size: 4rem;"></i>
+          <h3 class="text-muted mb-3">花が見つかりませんでした</h3>
+          <p class="text-muted mb-4">
+            検索条件を変更して再度お試しください
+          </p>
+          <%= link_to "すべての花を見る", flowers_path, class: "btn btn-success" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- ページネーション -->
+  <% if @flowers.respond_to?(:current_page) %>
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-center">
+          <%= paginate @flowers, theme: 'bootstrap_5' %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- 管理者用ボタン -->
+  <% if user_signed_in? && current_user.admin? %>
+    <div class="position-fixed bottom-0 end-0 m-4">
+      <%= link_to new_flower_path, class: "btn btn-success rounded-circle shadow-lg", 
+                 style: "width: 60px; height: 60px;", 
+                 data: { bs_toggle: "tooltip", bs_title: "新しい花を追加" } do %>
+        <i class="bi bi-plus-lg"></i>
+      <% end %>
+    </div>
+  <% end %>
+</div>

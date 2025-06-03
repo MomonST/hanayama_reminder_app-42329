@@ -11,11 +11,33 @@ Rails.application.routes.draw do
   # Usersの編集・表示関連
   resources :users, only: [:show, :edit, :update]
 
+  # 花関連のルート
+  resources :flowers do
+    member do
+      post :like
+    end
+  end
+
+  resources :mountains do
+    resources :flower_mountains, except: [:index]
+  end
+
+  resources :posts do
+    member do
+      post :like
+    end
+  end
+
   # FlowerMountainsのリソースをRESTfulに設定
+  
   resources :flower_mountains, only: [:index, :show]
 
   # 通知関連
-  resources :notifications, except: [:show]
+  resources :notifications, only: [:index, :update, :destroy] do
+    collection do
+      delete :clear_all
+    end
+  end
 
   # postsリソース内の「お気に入り」アクションを追加する場合
   resources :favorites, only: [:index, :create, :destroy]
@@ -34,6 +56,7 @@ Rails.application.routes.draw do
       resources :flower_mountains, only: [:index]
       resources :flowers, only: [:index]
       resources :mountains, only: [:index]
+      resources :posts, only: [:index, :create, :show]
     end
   end
 end

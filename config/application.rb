@@ -30,5 +30,6 @@ module HanayamaReminderApp42329
     
     # アセットパイプライン
     config.assets.precompile += %w( *.js *.css )
+
   end
 end
