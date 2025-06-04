@@ -21,9 +21,6 @@
               <h5 class="mb-0"><%= @post.user.nickname %></h5>
               <p class="text-muted small mb-0">
                 <%= l @post.created_at, format: :long %>
-                <% if @post.taken_at.present? %>
-                  <span class="ms-2">撮影日: <%= l @post.taken_at, format: :short %></span>
-                <% end %>
               </p>
             </div>
           </div>
@@ -33,7 +30,7 @@
           </div>
           
           <div class="position-relative mb-3">
-            <%= image_tag @post.image_url.presence || "/placeholder.svg?height=500&width=800", 
+            <%= image_tag (@post.image_url.url.presence || "/placeholder.svg?height=500&width=800"),
                         class: "img-fluid rounded", 
                         style: "width: 100%; object-fit: cover;" %>
           </div>
@@ -80,38 +77,38 @@
           <h5 class="card-title mb-0">詳細情報</h5>
         </div>
         <div class="card-body">
-          <% if @post.flower.present? %>
+          <% if @post.flower_mountain&.flower.present? %>
             <div class="mb-3">
               <h6 class="mb-2"><i class="bi bi-flower1 text-pink me-2"></i>花</h6>
               <div class="d-flex align-items-center">
-                <%= image_tag @post.flower.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower.name}", 
+                <%= image_tag @post.flower_mountain.flower.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower_mountain.flower.name}", 
                             class: "rounded me-2", 
                             style: "width: 50px; height: 50px; object-fit: cover;" %>
                 <div>
                   <h6 class="mb-0">
-                    <%= link_to @post.flower.name, flower_path(@post.flower), class: "text-decoration-none" %>
+                    <%= link_to @post.flower_mountain.flower.name, flower_path(@post.flower_mountain.flower), class: "text-decoration-none" %>
                   </h6>
-                  <small class="text-muted">見頃: <%= @post.flower.blooming_season %></small>
+                  <small class="text-muted">見頃: <%= @post.flower_mountain.flower.blooming_season %></small>
                 </div>
               </div>
             </div>
           <% end %>
           
-          <% if @post.mountain.present? %>
+          <% if @post.flower_mountain&.mountain.present? %>
             <div>
               <h6 class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>山</h6>
               <div class="d-flex align-items-center">
-                <%= image_tag @post.mountain.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.mountain.name}", 
+                <%= image_tag @post.flower_mountain.mountain.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower_mountain.mountain.name}", 
                             class: "rounded me-2", 
                             style: "width: 50px; height: 50px; object-fit: cover;" %>
                 <div>
                   <h6 class="mb-0">
-                    <%= link_to @post.mountain.name, mountain_path(@post.mountain), class: "text-decoration-none" %>
+                    <%= link_to @post.flower_mountain.mountain.name, mountain_path(@post.flower_mountain.mountain), class: "text-decoration-none" %>
                   </h6>
                   <small class="text-muted">
-                    <%= @post.mountain.region %>
-                    <% if @post.mountain.elevation.present? %>
-                      <span class="ms-1"><%= @post.mountain.elevation %>m</span>
+                    <%= @post.flower_mountain.mountain.region %>
+                    <% if @post.flower_mountain.mountain.elevation.present? %>
+                      <span class="ms-1"><%= @post.flower_mountain.mountain.elevation %>m</span>
                     <% end %>
                   </small>
                 </div>
@@ -122,7 +119,7 @@
       </div>
       
       <!-- 関連投稿 -->
-      <% if @related_posts.any? %>
+      <% if @related_posts.present? %>
         <div class="card border-0 shadow-sm">
           <div class="card-header bg-light">
             <h5 class="card-title mb-0">関連投稿</h5>

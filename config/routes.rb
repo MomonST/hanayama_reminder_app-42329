@@ -29,7 +29,6 @@ Rails.application.routes.draw do
   end
 
   # FlowerMountainsのリソースをRESTfulに設定
-  
   resources :flower_mountains, only: [:index, :show]
 
   # 通知関連

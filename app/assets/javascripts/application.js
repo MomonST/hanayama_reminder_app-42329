@@ -1,14 +1,23 @@
-//= require jquery3
-//= require popper
-//= require bootstrap-sprockets
-//= require rails-ujs
-//= require turbolinks
-//= require_tree .
+// app/javascript/application.js の修正案 (Rails 7 + Importmap)
+
+// @hotwired/turbo-rails, @hotwired/stimulus は既存のまま
 import "@hotwired/turbo-rails"
 import "@hotwired/stimulus"
 import "controllers"
+
+// Bootstrap を importmap 経由で読み込む
 import * as bootstrap from "bootstrap"
-import * as google from "googlemaps"
+
+// Google Maps API は通常、script タグで読み込むため、ここでは import しない
+// 例: <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+// あるいは、コントローラーやビューで動的にスクリプトタグを生成して読み込む
+
+// 必要であれば、jQuery も import
+// import "jquery" // importmap で jquery を pin している場合
+
+// Turbolinks は Rails 7 では Turbo に置き換わっているので通常不要
+// 必要であれば、個別の JS ファイルを読み込む
+// import "./my_custom_javascript_file"
 
 // グローバル変数
 window.HanayamaReminder = {
