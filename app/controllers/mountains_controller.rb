@@ -1,14 +1,14 @@
 class MountainsController < ApplicationController
   before_action :set_mountain, only: [:show]
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :admin_required, only: [:new, :create, :edit, :update, :destroy]
+  # before_action :admin_required, only: [:new, :create, :edit, :update, :destroy]
 
   def index
     @mountains = Mountain.includes(:flower_mountains, :flowers)
     
     # 検索・フィルタリング
     if params[:search].present?
-      @mountains = @mountains.where("name ILIKE ? OR description ILIKE ?", 
+      @mountains = @mountains.where("name LIKE ? OR description LIKE ?", 
                                   "%#{params[:search]}%", "%#{params[:search]}%")
     end
     
@@ -17,9 +17,7 @@ class MountainsController < ApplicationController
     end
     
     if params[:difficulty].present?
-      @mountains = @mountains.joins(:flower_mountains)
-                           .where(flower_mountains: { difficulty_level: params[:difficulty] })
-                           .distinct
+      @mountains = @mountains.where(difficulty_level: params[:difficulty])
     end
     
     if params[:elevation_min].present?
@@ -62,13 +60,11 @@ class MountainsController < ApplicationController
         flowers_count: mountain.flowers.count
       }
     end
-    
-    content_for :use_google_maps, true
   end
 
   def show
     @flower_mountains = @mountain.flower_mountains.includes(:flower)
-    @recent_posts = @mountain.posts.recent.includes(:user).limit(6)
+    @recent_posts = Post.joins(:flower_mountain).where(flower_mountains: { mountain_id: @mountain.id }).order(created_at: :desc).limit(6)
     
     # 現在見頃の花
     @blooming_now = @mountain.flowers.select(&:blooming_now?)
@@ -92,7 +88,6 @@ class MountainsController < ApplicationController
       @nearby_mountains = []
     end
     
-    content_for :use_google_maps, true
   end
 
   def new
@@ -141,7 +136,7 @@ class MountainsController < ApplicationController
                                     :trail_info, :image_url)
   end
 
-  def admin_required
-    redirect_to root_path, alert: '管理者権限が必要です。' unless current_user&.admin?
-  end
+  # def admin_required
+    #redirect_to root_path, alert: '管理者権限が必要です。' unless current_user&.admin?
+  # end
 end

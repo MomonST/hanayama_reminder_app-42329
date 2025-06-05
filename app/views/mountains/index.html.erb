@@ -1,3 +1,4 @@
+<%# Google Maps APIを使うビューであることをレイアウトに伝える %>
 <% content_for :use_google_maps, true %>
 
 <div class="container-fluid">
@@ -187,8 +188,8 @@
       <% if @mountains.respond_to?(:current_page) %>
         <div class="row">
           <div class="col-12">
-            <div class="d-flex justify-content-center">
-              <%= paginate @mountains, theme: 'bootstrap_5' %>
+            <!--div class="d-flex justify-content-center"-->
+              <%#= paginate @mountains %>
             </div>
           </div>
         </div>
@@ -205,8 +206,8 @@
     </div>
   </div>
 
-  <!-- 管理者用ボタン -->
-  <% if user_signed_in? && current_user.admin? %>
+  <!-- 管理者用ボタン 現状はなしのち追加：? && current_user.admin?-->
+  <% if defined?(user_signed_in?) && user_signed_in? %>
     <div class="position-fixed bottom-0 end-0 m-4">
       <%= link_to new_mountain_path, class: "btn btn-success rounded-circle shadow-lg", 
                 style: "width: 60px; height: 60px;", 

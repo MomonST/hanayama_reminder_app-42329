@@ -1,3 +1,4 @@
+<%# Google Maps APIを使うビューであることをレイアウトに伝える %>
 <% content_for :use_google_maps, true %>
 
 <div class="container-fluid">
@@ -21,6 +22,11 @@
                 <% if @mountain.elevation.present? %>
                   <p class="text-muted fs-5 mb-3">
                     標高: <%= @mountain.elevation %>m
+                  </p>
+                <% end %>
+                <% if @mountain.difficulty_level.present? %>
+                  <p class="text-muted fs-5 mb-3">
+                    難易度: <%= @mountain.difficulty_level %>
                   </p>
                 <% end %>
               </div>
@@ -63,7 +69,9 @@
                 </div>
                 <div class="col-4">
                   <div class="border rounded p-3">
-                    <h4 class="text-primary mb-1"><%= @recent_posts.count %></h4>
+                    <h4 class="text-primary mb-1">
+                      <%= Post.joins(:flower_mountain).where(flower_mountains: { mountain_id: @mountain.id }).count %>
+                    </h4>
                     <small class="text-muted">投稿数</small>
                   </div>
                 </div>
@@ -121,8 +129,8 @@
                   <% end %>
                   
                   <!-- 難易度バッジ -->
-                  <span class="badge bg-<%= flower_mountain.difficulty_level == '初心者' ? 'success' : flower_mountain.difficulty_level == '中級者' ? 'warning' : 'danger' %> position-absolute top-0 start-0 m-2">
-                    <%= flower_mountain.difficulty_level %>
+                  <span class="badge bg-<%= mountain.difficulty_level == '初心者' ? 'success' : mountain.difficulty_level == '中級者' ? 'warning' : 'danger' %> position-absolute top-0 start-0 m-2">
+                    <%= mountain.difficulty_level %>
                   </span>
                 </div>
                 
@@ -193,12 +201,6 @@
           <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
               <h5 class="card-title mb-4">アクセス情報</h5>
-              
-              <% if @mountain.access_info.present? %>
-                <p class="mb-4"><%= simple_format(@mountain.access_info) %></p>
-              <% else %>
-                <p class="text-muted">アクセス情報がありません</p>
-              <% end %>
               
               <% if @mountain.latitude.present? && @mountain.longitude.present? %>
                 <div class="d-grid">
@@ -306,11 +308,11 @@
             <div class="card-body">
               <h5 class="card-title mb-4">登山ルート情報</h5>
               
-              <% if @mountain.trail_info.present? %>
-                <p class="mb-4"><%= simple_format(@mountain.trail_info) %></p>
-              <% else %>
+              <%# if @mountain.trail_info.present? %>
+                <p class="mb-4"><%#= simple_format(@mountain.trail_info) %></p>
+              <%# else %>
                 <p class="text-muted">登山ルート情報がありません</p>
-              <% end %>
+              <%# end %>
             </div>
           </div>
           
@@ -348,6 +350,10 @@
                   <tr>
                     <th scope="row" class="ps-0">地域</th>
                     <td><%= @mountain.region %></td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="ps-0">難易度</th>
+                    <td><%= @mountain.difficulty_level %></td>
                   </tr>
                   <tr>
                     <th scope="row" class="ps-0">標高</th>
@@ -391,6 +397,19 @@
   </div>
 </div>
 
+<button
+  class="btn btn-success"
+  id="addToCalendarBtn"
+  data-signed-in="<%= user_signed_in? %>"
+  data-blooming-now="<%= @blooming_now.any? %>"
+  data-title="<%= @mountain.name %> 登山"
+  data-desc="現在見頃の花: <%= @blooming_now.map(&:name).join(', ') %>"
+>
+  <i class="bi bi-calendar-plus me-2"></i>
+  カレンダーに追加
+</button>
+
+
 <script>
   // シェア機能
   function shareMountain() {
@@ -409,34 +428,44 @@
   }
   
   // カレンダーに追加
+  
   function addToCalendar() {
-    <% if user_signed_in? %>
-      // 現在見頃の花があれば、その情報を含める
-      <% if @blooming_now.any? %>
-        const title = '<%= @mountain.name %> 登山';
-        const desc = '現在見頃の花: <%= @blooming_now.map(&:name).join(", ") %>';
-        const url = window.location.href;
-        
-        // 2週間後の日付を設定
-        const twoWeeksLater = new Date();
-        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
-        const year = twoWeeksLater.getFullYear();
-        const month = String(twoWeeksLater.getMonth() + 1).padStart(2, '0');
-        const day = String(twoWeeksLater.getDate()).padStart(2, '0');
-        
-        const startDate = `${year}${month}${day}`;
-        const endDate = startDate;
-        
-        const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(desc + '\n\n' + url)}`;
-        
-        window.open(googleCalUrl, '_blank');
-        showAlert('Googleカレンダーが開きました。日程を調整してください。', 'success');
-      <% else %>
-        showAlert('カレンダーに追加する日程を選択してください', 'info');
-        // TODO: 日程選択モーダルを表示
-      <% end %>
-    <% else %>
-      window.location.href = '<%= new_user_session_path %>';
-    <% end %>
+    const btn = document.getElementById("addToCalendarBtn");
+    const signedIn = btn.dataset.signedIn === "true";
+    const bloomingNow = btn.dataset.bloomingNow === "true";
+    const title = btn.dataset.title;
+    const desc = btn.dataset.desc;
+    const url = window.location.href;
+
+    if (!signedIn) {
+      window.location.href = "<%= new_user_session_path %>";
+      return;
+    }
+
+    if (bloomingNow) {
+      const twoWeeksLater = new Date();
+      twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+      const year = twoWeeksLater.getFullYear();
+      const month = String(twoWeeksLater.getMonth() + 1).padStart(2, "0");
+      const day = String(twoWeeksLater.getDate()).padStart(2, "0");
+
+      const startDate = `${year}${month}${day}`;
+      const endDate = startDate;
+
+      const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(desc + '\n\n' + url)}`;
+
+      window.open(googleCalUrl, "_blank");
+      showAlert("Googleカレンダーが開きました。日程を調整してください。", "success");
+    } else {
+      showAlert("カレンダーに追加する日程を選択してください", "info");
+    }
   }
+
+  // ページ読み込み時にボタンにイベントリスナーを付与
+  document.addEventListener("DOMContentLoaded", function() {
+    const calendarBtn = document.getElementById("addToCalendarBtn");
+    if (calendarBtn) {
+      calendarBtn.addEventListener("click", addToCalendar);
+    }
+  });
 </script>

@@ -1,19 +1,15 @@
 class FlowersController < ApplicationController
   before_action :set_flower, only: [:show]
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :admin_required, only: [:new, :create, :edit, :update, :destroy]
+  #before_action :admin_required, only: [:new, :create, :edit, :update, :destroy]
 
   def index
     @flowers = Flower.includes(:flower_mountains, :mountains)
     
     # 検索・フィルタリング
     if params[:search].present?
-      @flowers = @flowers.where("name ILIKE ? OR scientific_name ILIKE ?", 
+      @flowers = @flowers.where("name LIKE ? OR scientific_name LIKE ?", 
                                "%#{params[:search]}%", "%#{params[:search]}%")
-    end
-    
-    if params[:blooming_season].present?
-      @flowers = @flowers.where(blooming_season: params[:blooming_season])
     end
     
     if params[:region].present?
@@ -21,7 +17,7 @@ class FlowersController < ApplicationController
     end
     
     if params[:difficulty].present?
-      @flowers = @flowers.joins(:flower_mountains).where(flower_mountains: { difficulty_level: params[:difficulty] })
+      @flowers = @flowers.joins(flower_mountains: :mountain).where(mountains: { difficulty_level: params[:difficulty] })
     end
     
     # ソート
@@ -42,19 +38,30 @@ class FlowersController < ApplicationController
     @total_flowers = Flower.count
     @blooming_now = Flower.blooming_now.count
     @regions = Mountain.distinct.pluck(:region).compact.sort
-    @seasons = Flower.distinct.pluck(:blooming_season).compact.sort
+    @seasons = Flower.all.map(&:blooming_season).compact.uniq.sort
   end
 
   def show
     @flower_mountains = @flower.flower_mountains.includes(:mountain, :posts)
-    @recent_posts = @flower.posts.recent.includes(:user).limit(6)
-    @is_liked = user_signed_in? ? current_user.likes.exists?(flower: @flower) : false
-    @likes_count = @flower.likes.count
+    @recent_posts = Post.joins(:flower_mountain)
+                        .where(flower_mountains: { flower_id: @flower.id })
+                        .order(created_at: :desc)
+                        .limit(6)
+    
+    # いいね機能：flowers_controller.rb の showアクションに追加
+    @favorites_count = Favorite.joins(:flower_mountain).where(flower_mountains: { flower_id: @flower.id }).count
+    # いいね機能：「ユーザーがお気に入りにしてるか」も必要なら
+    @is_favorited = user_signed_in? ? current_user.favorites.joins(:flower_mountain).exists?(flower_mountains: { flower_id: @flower.id }) : false
+    # いいね機能：flowerに関連する「投稿のいいね合計」を表示する場合
+    @total_post_likes = Post.joins(flower_mountain: :flower)
+                         .where(flower_mountains: { flower_id: @flower.id })
+                         .joins(:post_likes)
+                         .count
     
     # 関連する花（同じ季節の花）
-    @related_flowers = Flower.where(blooming_season: @flower.blooming_season)
-                            .where.not(id: @flower.id)
-                            .limit(4)
+    @related_flowers = Flower.all
+      .select { |f| f.blooming_season == @flower.blooming_season && f.id != @flower.id }
+      .first(4)
     
     # 地図用データ
     @map_data = @flower_mountains.map do |fm|
@@ -68,8 +75,6 @@ class FlowersController < ApplicationController
         days_left: fm.days_until_peak
       }
     end
-    
-    content_for :use_google_maps, true
   end
 
   def new
@@ -123,7 +128,6 @@ class FlowersController < ApplicationController
         render json: { 
           success: true, 
           liked: liked, 
-          likes_count: @flower.likes.count 
         } 
       }
       format.html { redirect_back(fallback_location: @flower) }
@@ -141,7 +145,7 @@ class FlowersController < ApplicationController
                                   :peak_period, :image_url, :characteristics, :habitat)
   end
 
-  def admin_required
-    redirect_to root_path, alert: '管理者権限が必要です。' unless current_user&.admin?
-  end
+  #def admin_required
+    #redirect_to root_path, alert: '管理者権限が必要です。' unless current_user&.admin?
+  #end
 end

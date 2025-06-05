@@ -166,7 +166,7 @@
           <%= link_to post_path(post), class: "text-decoration-none" do %>
             <div class="card border-0 shadow-sm h-100 hover-card">
               <% if post.image_url.present? %>
-                <%= image_tag post.image_url, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
+                <%= image_tag post.image_url.url, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
               <% else %>
                 <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                   <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
@@ -209,6 +209,24 @@
   </div>
   
 <% else %>
+  <!-- CTA セクション -->
   <!-- 未ログインユーザー向けランディングページ -->
-  <!-- ... (省略) ... -->
+    <section class="text-center py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-lg bg-gradient-to-r from-green-50 to-pink-50">
+            <div class="card-body p-5">
+              <h3 class="text-gradient mb-3">今すぐ始めよう</h3>
+              <p class="text-muted mb-4">
+                無料で登録して、あなただけの花山リマインダーを設定しましょう。
+                見頃の花を見逃すことはもうありません。
+              </p>
+              <%= link_to new_user_registration_path, class: "btn btn-success btn-lg" do %>
+                <i class="bi bi-person-plus me-2"></i>無料で始める
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 <% end %>

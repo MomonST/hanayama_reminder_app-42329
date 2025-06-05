@@ -39,7 +39,7 @@ class FlowerMountainsController < ApplicationController
   
   def show
     @flower_mountain = FlowerMountain.includes(:flower, :mountain).find(params[:id])
-    @posts = @flower_mountain.posts.latest.includes(:user).page(params[:page]).per(5)
+    @posts = @flower_mountain.posts.recent.includes(:user).page(params[:page]).per(5)
     
     # ログイン済みの場合、お気に入り状態を確認
     if user_signed_in?
