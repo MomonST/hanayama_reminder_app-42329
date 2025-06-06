@@ -3,6 +3,7 @@ class Post < ApplicationRecord
   belongs_to :user
   belongs_to :flower_mountain
   belongs_to :mountain, optional: true
+  has_many :likes, dependent: :destroy
   has_many :post_likes, dependent: :destroy
   has_many :liked_users, through: :post_likes, source: :user
   

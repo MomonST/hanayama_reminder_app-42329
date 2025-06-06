@@ -21,16 +21,16 @@
     <!-- Stylesheets -->
     <%= stylesheet_link_tag 'application', 'data-turbolinks-track': 'reload' %>
     
+    <!-- JavaScript -->
+    <%= javascript_importmap_tags %>
+
     <!-- Google Maps API -->
     <% if content_for?(:use_google_maps) %>
-      <script>
-        window.mapData = <%= raw @map_data.to_json if defined?(@map_data) %>;
+      <script>window.mapData = <%= raw @map_data.to_json if defined?(@map_data) && @map_data.present? %>;</script>
+      <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer>
       </script>
-      <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer></script>
     <% end %>
     
-    <!-- JavaScript -->
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body class="gradient-bg">

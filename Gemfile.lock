@@ -192,6 +192,9 @@ GEM
     kaminari-activerecord (1.2.2)
       activerecord
       kaminari-core (= 1.2.2)
+    kaminari-bootstrap (3.0.1)
+      kaminari (>= 0.13.0)
+      rails
     kaminari-core (1.2.2)
     logger (1.7.0)
     loofah (2.24.1)
@@ -401,6 +404,7 @@ DEPENDENCIES
   jbuilder
   jquery-rails
   kaminari
+  kaminari-bootstrap (~> 3.0)
   mini_magick
   mysql2 (~> 0.5)
   pg

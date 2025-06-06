@@ -19,7 +19,11 @@ Rails.application.routes.draw do
   end
 
   resources :mountains do
-    resources :flower_mountains, except: [:index]
+    resources :flower_mountains do
+      member do
+        post :favorite
+      end
+    end
   end
 
   resources :posts do
@@ -29,13 +33,14 @@ Rails.application.routes.draw do
   end
 
   # FlowerMountainsのリソースをRESTfulに設定
-  
   resources :flower_mountains, only: [:index, :show]
 
   # 通知関連
-  resources :notifications, only: [:index, :update, :destroy] do
-    collection do
-      delete :clear_all
+  authenticate :user do
+    resources :notifications, only: [:index, :new, :create, :edit, :update, :destroy] do
+      collection do
+        delete :clear_all
+      end
     end
   end
 

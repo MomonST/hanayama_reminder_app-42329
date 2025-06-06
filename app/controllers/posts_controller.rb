@@ -11,7 +11,7 @@ class PostsController < ApplicationController
     when "popular"
       @posts = @posts.popular
     else
-      @posts = @posts.latest
+      @posts = @posts.recent
     end
     
     # 地域でフィルタリング

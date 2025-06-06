@@ -30,18 +30,19 @@
               <div class="d-flex gap-3 mb-4">
                 <!-- いいねボタン -->
                 <% if user_signed_in? %>
-                  <%= link_to like_flower_path(@flower), 
-                             method: :post, 
-                             remote: true,
-                             class: "btn #{'btn-pink' if @is_liked} #{'btn-outline-pink' unless @is_liked} like-button",
-                             data: { method: 'post' } do %>
-                    <i class="bi bi-heart<%= '-fill' if @is_liked %> me-2"></i>
-                    いいね <span class="like-count">(<%= @likes_count %>)</span>
+                  <% if @is_favorited %>
+                    <%= link_to favorite_path(@flower), method: :delete, class: "btn btn-warning" do %>
+                      <i class="bi bi-star-fill me-2"></i> お気に入り解除
+                    <% end %>
+                  <% else %>
+                    <%= link_to favorites_path(flower_mountain_id: @flower.flower_mountains.first.id), method: :post, class: "btn btn-outline-warning" do %>
+                      <i class="bi bi-star me-2"></i> お気に入り追加
+                    <% end %>
                   <% end %>
+                  <span class="ms-2 text-muted"><%= @favorites_count %>人がお気に入り</span>
                 <% else %>
-                  <%= link_to new_user_session_path, class: "btn btn-outline-pink" do %>
-                    <i class="bi bi-heart me-2"></i>
-                    いいね (<%= @likes_count %>)
+                  <%= link_to new_user_session_path, class: "btn btn-outline-warning" do %>
+                    <i class="bi bi-star me-2"></i> お気に入りに追加 (ログインが必要)
                   <% end %>
                 <% end %>
                 
@@ -129,9 +130,9 @@
                     <%= flower_mountain.mountain.region %>
                   </p>
                   
-                  <% if flower_mountain.peak_period.present? %>
+                  <% if flower_mountain.peak_month.present? %>
                     <p class="mb-3">
-                      <strong>見頃:</strong> <%= flower_mountain.peak_period %>
+                      <strong>見頃:</strong> <%= flower_mountain.peak_month %>
                     </p>
                   <% end %>
                   
@@ -172,6 +173,26 @@
         </div>
       </div>
     </div>
+
+    <%# ここに地図の初期化関数initMapを呼び出すためのJavaScriptを記述する %>
+    <script>
+      function initMap() {
+        // window.mapData を利用して地図を初期化
+        const map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: window.mapData[0].lat, lng: window.mapData[0].lng }, // 例: 最初の地点を中心に設定
+          zoom: 10
+        });
+
+        // マーカーの追加（@map_dataが配列の場合）
+        window.mapData.forEach(function(place) {
+          new google.maps.Marker({
+            position: { lat: place.lat, lng: place.lng },
+            map: map,
+            title: place.title
+          });
+        });
+      }
+    </script>
 
     <!-- 投稿写真 -->
     <div class="tab-pane fade" id="posts" role="tabpanel">
@@ -223,20 +244,20 @@
         <div class="col-md-8">
           <div class="card border-0 shadow-sm">
             <div class="card-body">
-              <h5 class="card-title mb-4">花の特徴</h5>
+              <h5 class="card-title mb-4">花の学名</h5>
               
-              <% if @flower.characteristics.present? %>
-                <p class="mb-4"><%= simple_format(@flower.characteristics) %></p>
+              <% if @flower.scientific_name.present? %>
+                <p class="mb-4"><%= simple_format(@flower.scientific_name) %></p>
               <% end %>
               
-              <% if @flower.habitat.present? %>
-                <h6 class="mb-3">生息環境</h6>
-                <p class="mb-4"><%= simple_format(@flower.habitat) %></p>
+              <% if @flower.description.present? %>
+                <h6 class="mb-3">詳細</h6>
+                <p class="mb-4"><%= simple_format(@flower.description) %></p>
               <% end %>
               
-              <% if @flower.peak_period.present? %>
+              <% if @flower.blooming_season.present? %>
                 <h6 class="mb-3">見頃時期</h6>
-                <p class="mb-4"><%= @flower.peak_period %></p>
+                <p class="mb-4"><%= @flower.blooming_season %></p>
               <% end %>
             </div>
           </div>

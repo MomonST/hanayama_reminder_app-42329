@@ -7,11 +7,12 @@ class Notification < ApplicationRecord
   # validates :title, presence: true
   # validates :message, presence: true
   validates :days_before, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
-  validates :user_id, uniqueness: { scope: :flower_mountain_id, message: "既にこの花山スポットの通知が設定されています" }
+  validates :user_id, presence: true, uniqueness: { scope: :flower_mountain_id, message: "既にこの花山スポットの通知が設定されています" }
   validates :notification_date, presence: true
+  validates :flower_mountain_id, presence: true
 
   # 通知日の自動計算
-  before_save :calculate_notification_date
+  before_validation :calculate_notification_date
   
   # 今日送信すべき通知を取得
   scope :to_be_sent_today, -> { where(notification_date: Date.today, sent: false) }
@@ -84,6 +85,8 @@ class Notification < ApplicationRecord
   
   # 通知日を計算（見頃の日付から指定日数前）
   def calculate_notification_date
+    return unless flower_mountain.present? && days_before.present?
+
     peak_month = flower_mountain.peak_month
     return unless peak_month
     
@@ -96,5 +99,6 @@ class Notification < ApplicationRecord
     end
     
     self.notification_date = peak_date - days_before.days
+    
   end
 end

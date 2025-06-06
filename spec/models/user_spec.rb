@@ -78,19 +78,10 @@ RSpec.describe User, type: :model do
       association = described_class.reflect_on_association(:favorites)
       expect(association.macro).to eq :has_many
     end
-
-    it 'favorite_flowersとの関連があること' do
-      association = described_class.reflect_on_association(:favorite_flowers)
-      expect(association.macro).to eq :has_many
-    end
-
-    it 'favorite_mountainsとの関連があること' do
-      association = described_class.reflect_on_association(:favorite_mountains)
-      expect(association.macro).to eq :has_many
-    end
   end
 
   describe 'メソッド' do
+    let(:user) { create(:user) }   # ← これが必要！
 
     describe '#full_name' do
       it 'フルネームを返すこと' do
@@ -108,29 +99,17 @@ RSpec.describe User, type: :model do
       end
     end
 
-    describe '#favorited_flower?' do
-      let(:flower) { create(:flower) }
+    describe '#favorited_flower_mountain?' do
+      let(:user) { create(:user) }
+      let(:flower_mountain) { create(:flower_mountain) }
 
       it 'お気に入りに登録済みの場合trueを返すこと' do
-        create(:favorite, :flower_favorite, user: user, flower: flower)
-        expect(user.favorited_flower?(flower)).to be true
+        create(:favorite, user: user, flower_mountain: flower_mountain)
+        expect(user.favorited_flower_mountain?(flower_mountain)).to be true
       end
 
       it 'お気に入りに未登録の場合falseを返すこと' do
-        expect(user.favorited_flower?(flower)).to be false
-      end
-    end
-
-    describe '#favorited_mountain?' do
-      let(:mountain) { create(:mountain) }
-
-      it 'お気に入りに登録済みの場合trueを返すこと' do
-        create(:favorite, :mountain_favorite, user: user, mountain: mountain)
-        expect(user.favorited_mountain?(mountain)).to be true
-      end
-
-      it 'お気に入りに未登録の場合falseを返すこと' do
-        expect(user.favorited_mountain?(mountain)).to be false
+        expect(user.favorited_flower_mountain?(flower_mountain)).to be false
       end
     end
   end

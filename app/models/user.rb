@@ -29,4 +29,8 @@ class User < ApplicationRecord
   def full_name_kana
     "#{last_name_kana} #{first_name_kana}"
   end
+
+  def favorited_flower_mountain?(flower_mountain)
+    favorites.exists?(flower_mountain: flower_mountain)
+  end
 end

@@ -115,21 +115,10 @@
               <% end %>
               
               <!-- いいねボタン -->
-              <% if user_signed_in? %>
-                <%= link_to like_flower_path(flower), 
-                           method: :post, 
-                           remote: true,
-                           class: "btn btn-sm btn-light position-absolute bottom-0 end-0 m-2 like-button #{'liked' if current_user.likes.exists?(flower: flower)}",
-                           data: { method: 'post' } do %>
-                  <i class="bi bi-heart<%= '-fill' if current_user.likes.exists?(flower: flower) %>"></i>
-                  <span class="like-count"><%= flower.likes.count %></span>
-                <% end %>
-              <% else %>
-                <span class="btn btn-sm btn-light position-absolute bottom-0 end-0 m-2">
-                  <i class="bi bi-heart"></i>
-                  <span><%= flower.likes.count %></span>
-                </span>
-              <% end %>
+              <small class="text-muted">
+                <i class="bi bi-star"></i>
+                <%= Favorite.joins(:flower_mountain).where(flower_mountains: { flower_id: flower.id }).count %>人がお気に入り
+              </small>
             </div>
             
             <div class="card-body">
@@ -179,7 +168,7 @@
     <div class="row">
       <div class="col-12">
         <div class="d-flex justify-content-center">
-          <%= paginate @flowers, theme: 'bootstrap_5' %>
+          <%= paginate @flowers %>
         </div>
       </div>
     </div>
