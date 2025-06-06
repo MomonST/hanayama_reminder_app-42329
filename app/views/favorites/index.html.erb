@@ -1,2 +1,74 @@
-<h1>Favorites#index</h1>
-<p>Find me in app/views/favorites/index.html.erb</p>
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "ホーム", root_path %></li>
+      <li class="breadcrumb-item active" aria-current="page">お気に入り</li>
+    </ol>
+  </nav>
+  
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="h3">
+        <i class="bi bi-heart-fill text-danger me-2"></i>
+        お気に入り
+      </h1>
+    </div>
+  </div>
+  
+  <% if @favorites.any? %>
+    <div class="row">
+      <% @favorites.each do |favorite| %>
+        <div class="col-md-4 col-lg-3 mb-4">
+          <div class="card border-0 shadow-sm hover-card h-100">
+            <div class="position-relative">
+              <%= image_tag favorite.flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{favorite.flower.name}", 
+                          class: "card-img-top", 
+                          style: "height: 200px; object-fit: cover;" %>
+              <% if favorite.flower.blooming_now? %>
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">見頃</span>
+              <% end %>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title mb-2">
+                <%= link_to favorite.flower.name, flower_path(favorite.flower), class: "text-decoration-none text-dark" %>
+              </h5>
+              <p class="text-muted mb-2">
+                <i class="bi bi-geo-alt me-1"></i>
+                <%= favorite.mountain.name %> (<%= favorite.mountain.region %>)
+              </p>
+              <p class="card-text small text-muted mb-3">
+                <%= truncate(favorite.flower.description, length: 60) %>
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                  <i class="bi bi-calendar"></i>
+                  <%= favorite.flower.blooming_season %>
+                </small>
+                <div>
+                  <%= link_to "詳細", flower_path(favorite.flower), class: "btn btn-outline-success btn-sm me-1" %>
+                  <%= link_to favorite_path(favorite), method: :delete, 
+                              data: { confirm: "お気に入りから削除しますか？" }, 
+                              class: "btn btn-outline-danger btn-sm" do %>
+                    <i class="bi bi-heart-fill"></i>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- ページネーション -->
+    <div class="d-flex justify-content-center">
+      <%= paginate @favorites %>
+    </div>
+  <% else %>
+    <div class="text-center py-5">
+      <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
+      <h4 class="text-muted mt-3">お気に入りがありません</h4>
+      <p class="text-muted">気になる花と山の組み合わせを見つけたら、ハートマークをクリックしてお気に入りに追加しましょう。</p>
+      <%= link_to "花図鑑を見る", flowers_path, class: "btn btn-success" %>
+    </div>
+  <% end %>
+</div>
