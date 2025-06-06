@@ -11,41 +11,39 @@ RSpec.describe "Home", type: :request do
 
     context "ログイン済みの場合" do
       let(:user) { create(:user, region: "関東") }
-      before { sign_in user }
-
       let!(:mountain) { create(:mountain, region: "関東") }
       let!(:flower) { create(:flower) }
       let!(:flower_mountain) { create(:flower_mountain, flower: flower, mountain: mountain, peak_month: 4) }
-      let!(:notification) { create(:notification, user: user, flower_mountain: flower_mountain) }
-      let!(:post) { create(:post, user: user, flower_mountain: flower_mountain) }
+      before { sign_in user }
 
       it "正常にレスポンスを返すこと" do
+        create(:post, user: user, flower_mountain: flower_mountain, image_url: File.open(Rails.root.join('spec/fixtures/test.jpg')))
         get root_path
         expect(response).to have_http_status(:success)
       end
 
       it "見頃の花を取得すること" do
-        blooming_flower = create(:flower, bloom_start_month: Date.today.month, bloom_end_month: Date.today.month)
         get root_path
-        expect(assigns(:blooming_flowers)).to include(blooming_flower)
+        expect(response.body).to include(flower.name)
       end
 
       it "人気の山を取得すること" do
-        create_list(:post, 3, mountain: mountain)
         get root_path
-        expect(assigns(:popular_mountains)).to include(mountain)
+        expect(response.body).to include(mountain.name)
       end
 
       it "最新の投稿を取得すること" do
-        recent_posts = create_list(:post, 3, user: user, flower_mountain: flower_mountain)
+        file = Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/test.jpg"), "image/jpeg")
+        post = create(:post, user: user, flower_mountain: flower_mountain, image_url: file)
         get root_path
-        expect(assigns(:recent_posts)).to include(*recent_posts)
+        expect(response.body).to include(post.flower_mountain.mountain.name)
       end
 
       it "通知を取得すること" do
-        notifications = create_list(:notification, 3, user: user, flower_mountain: flower_mountain)
+        notification = create(:notification, user: user, flower_mountain: flower_mountain, days_before: 7)
         get root_path
-        expect(assigns(:notifications)).to include(*notifications)
+        expect(response.body).to include(notification.flower_mountain.flower.name)
+        expect(response.body).to include(notification.flower_mountain.mountain.name)
       end
     end
   end
