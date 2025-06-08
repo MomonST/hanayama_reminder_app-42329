@@ -1,12 +1,12 @@
 module Api
   module V1
     class PostsController < ApplicationController
-      skip_before_action :authenticate_user!, only: [:index, :show]
-      before_action :authenticate_user!, only: [:create]
+      skip_before_action :authenticate_user!, only: [:index, :show] # 基本的にAPIではセッション認証は不要
+      before_action :authenticate_user!, only: [:create] # 例: APIトークン認証を導入する場合,authenticate_user_by_token!
       before_action :set_post, only: [:show]
       
       def index
-        @posts = Post.includes(:user, :flower, :mountain).recent
+         @posts = Post.includes(:user, flower_mountain: [:flower, :mountain]).recent
         
         # 検索・フィルタリング
         if params[:search].present?
@@ -44,8 +44,12 @@ module Api
             methods: [:likes_count],
             include: {
               user: { only: [:id, :nickname] },
-              flower: { only: [:id, :name] },
-              mountain: { only: [:id, :name, :region] }
+              flower_mountain: {
+                include: {
+                  flower: { only: [:id, :name] },
+                  mountain: { only: [:id, :name, :region] }
+                }
+              }
             }
           ),
           meta: {
@@ -65,8 +69,12 @@ module Api
             methods: [:likes_count],
             include: {
               user: { only: [:id, :nickname] },
-              flower: { only: [:id, :name, :image_url] },
-              mountain: { only: [:id, :name, :region, :elevation] }
+              flower_mountain: {
+                include: {
+                  flower: { only: [:id, :name, :image_url] },
+                  mountain: { only: [:id, :name, :region, :elevation] }
+                }
+              }
             }
           )
         }
@@ -82,8 +90,12 @@ module Api
               only: [:id, :content, :image_url, :created_at],
               include: {
                 user: { only: [:id, :nickname] },
-                flower: { only: [:id, :name] },
-                mountain: { only: [:id, :name] }
+                flower_mountain: {
+                  include: {
+                    flower: { only: [:id, :name] },
+                    mountain: { only: [:id, :name] }
+                  }
+                }
               }
             )
           }, status: :created
@@ -102,7 +114,13 @@ module Api
       end
       
       def post_params
-        params.require(:post).permit(:content, :image_url, :flower_id, :mountain_id, :taken_at)
+        params.require(:post).permit(:content, :image_url, :flower_mountain_id, :taken_at)
+      end
+
+      # 例: APIトークン認証のメソッド (実際の認証ロジックはUserモデルや別のconcernで定義)
+      def authenticate_user_by_token!
+        # リクエストヘッダーからトークンを取得し、ユーザーを認証するロジック
+        # raise ActionController::RoutingError, 'Not Found' unless current_user_for_api # 仮のメソッド名
       end
     end
   end

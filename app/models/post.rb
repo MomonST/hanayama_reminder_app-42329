@@ -5,7 +5,7 @@ class Post < ApplicationRecord
   belongs_to :mountain, optional: true
   has_many :likes, dependent: :destroy
   has_many :post_likes, dependent: :destroy
-  has_many :liked_users, through: :post_likes, source: :user
+  has_many :liked_users, through: :likes, source: :user
   
   # バリデーション
   validates :content, presence: true, length: { maximum: 500 }

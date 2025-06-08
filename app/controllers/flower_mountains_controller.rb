@@ -31,10 +31,11 @@ class FlowerMountainsController < ApplicationController
       }
     end
     
-    respond_to do |format|
-      format.html
-      format.json { render json: @map_data }
-    end
+    # format.json はAPIコントローラーに一任するため削除を推奨
+    #respond_to do |format|
+      #format.html
+      #format.json { render json: @map_data }
+    #end
   end
   
   def show

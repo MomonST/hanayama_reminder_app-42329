@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_action :authorize_user!, only: [:edit, :update]
   
   def show
-    @posts = @user.posts.latest.includes(flower_mountain: [:flower, :mountain]).limit(6)
+    @posts = @user.posts.recent.includes(flower_mountain: [:flower, :mountain]).limit(6)
     @favorites = @user.favorites.includes(flower_mountain: [:flower, :mountain]).limit(6)
     @notifications = @user.notifications.includes(flower_mountain: [:flower, :mountain]).limit(4)
   end

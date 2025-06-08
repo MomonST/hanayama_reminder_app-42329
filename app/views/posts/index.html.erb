@@ -1,2 +1,151 @@
-<h1>Posts#index</h1>
-<p>Find me in app/views/posts/index.html.erb</p>
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "ホーム", root_path %></li>
+      <li class="breadcrumb-item active" aria-current="page">投稿写真</li>
+    </ol>
+  </nav>
+  
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="h3">
+        <i class="fas fa-camera text-pink me-2"></i>
+        投稿写真ランキング
+      </h1>
+      <p class="text-muted">ユーザーがリアルタイムで投稿した花の写真をチェックしよう</p>
+    </div>
+    <div class="col-md-4 text-md-right">
+      <% if user_signed_in? %>
+        <%= link_to new_post_path, class: "btn btn-pink" do %>
+          <i class="fas fa-camera me-1"></i>写真を投稿
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- 検索・フィルター -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <%= form_with url: posts_path, method: :get, local: true, class: "row g-3" do |f| %>
+        <div class="col-md-3">
+          <%= f.text_field :search, placeholder: "キーワード検索", value: params[:search], class: "form-control" %>
+        </div>
+        <div class="col-md-3">
+          <%= f.collection_select :flower_id, Flower.order(:name), :id, :name, 
+                                 { prompt: "花を選択", selected: params[:flower_id] }, 
+                                 { class: "custom-select" } %>
+        </div>
+        <div class="col-md-3">
+          <%= f.collection_select :mountain_id, Mountain.order(:name), :id, :name, 
+                                 { prompt: "山を選択", selected: params[:mountain_id] }, 
+                                 { class: "custom-select" } %>
+        </div>
+        <div class="col-md-3">
+          <%= f.select :sort, 
+                      options_for_select([
+                        ['新着順', 'recent'],
+                        ['古い順', 'oldest'],
+                        ['人気順', 'popular']
+                      ], params[:sort]), 
+                      { prompt: "並び順" }, 
+                      { class: "custom-select" } %>
+        </div>
+        <div class="col-12">
+          <%= f.submit "検索", class: "btn btn-success me-2" %>
+          <%= link_to "リセット", posts_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- 投稿一覧 -->
+  <% if @posts.any? %>
+    <div class="row">
+      <% @posts.each do |post| %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card border-0 shadow-sm hover-card h-100">
+            <div class="position-relative">
+              <%= link_to post_path(post) do %>
+                <%= image_tag post.image_url.presence || "/placeholder.svg?height=250&width=400", 
+                            class: "card-img-top", 
+                            style: "height: 250px; object-fit: cover;" %>
+              <% end %>
+              
+              <!-- いいねボタン -->
+              <div class="position-absolute top-0 end-0 m-2">
+                <% if user_signed_in? %>
+                  <%= link_to like_post_path(post), method: :post, 
+                              class: "like-button btn btn-sm #{'btn-danger' if current_user.likes.exists?(post: post)} #{'btn-outline-light' unless current_user.likes.exists?(post: post)}", 
+                              data: { remote: true } do %>
+                    <i class="fas fa-heart"></i>
+                    <span class="like-count"><%= post.likes_count %></span>
+                  <% end %>
+                <% else %>
+                  <button class="btn btn-sm btn-outline-light" disabled>
+                    <i class="far fa-heart"></i>
+                    <%= post.likes_count %>
+                  </button>
+                <% end %>
+              </div>
+              
+              <!-- 花・山バッジ -->
+              <div class="position-absolute bottom-0 start-0 m-2">
+                <% if post.flower %>
+                  <span class="badge bg-pink me-1">
+                    <i class="fas fa-seedling me-1"></i><%= post.flower.name %>
+                  </span>
+                <% end %>
+                <% if post.mountain %>
+                  <span class="badge bg-success">
+                    <i class="fas fa-mountain me-1"></i><%= post.mountain.name %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+            
+            <div class="card-body">
+              <p class="card-text mb-3">
+                <%= truncate(post.content, length: 80) %>
+              </p>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <i class="fas fa-user text-secondary"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted">
+                      <%= link_to post.user.nickname, user_path(post.user), class: "text-decoration-none" %>
+                    </small>
+                    <br>
+                    <small class="text-muted">
+                      <%= time_ago_in_words(post.created_at) %>前
+                    </small>
+                  </div>
+                </div>
+                
+                <%= link_to "詳細", post_path(post), class: "btn btn-outline-primary btn-sm" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- ページネーション -->
+    <div class="d-flex justify-content-center">
+      <%= paginate @posts %>
+    </div>
+  <% else %>
+    <div class="text-center py-5">
+      <i class="fas fa-camera text-muted" style="font-size: 4rem;"></i>
+      <h4 class="text-muted mt-3">投稿がありません</h4>
+      <p class="text-muted">まだ投稿された写真がありません。最初の投稿をしてみませんか？</p>
+      <% if user_signed_in? %>
+        <%= link_to "写真を投稿する", new_post_path, class: "btn btn-pink" %>
+      <% else %>
+        <%= link_to "ログインして投稿する", new_user_session_path, class: "btn btn-success" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
