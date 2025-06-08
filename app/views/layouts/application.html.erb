@@ -19,14 +19,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     
     <!-- Stylesheets -->
-    <%= stylesheet_link_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     
     <!-- JavaScript -->
     <%= javascript_importmap_tags %>
 
     <!-- Google Maps API -->
     <% if content_for?(:use_google_maps) %>
-      <script>window.mapData = <%= raw @map_data.to_json if defined?(@map_data) && @map_data.present? %>;</script>
+      // mapDataがある場合はここで定義 (mapDataはビューで定義されている前提)
+      <script>
+      window.mapData = <%= raw @map_data.to_json if defined?(@map_data) && @map_data.present? %>;
+      </script>
       <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer>
       </script>
     <% end %>
@@ -79,12 +82,133 @@
       // ページトップボタンの表示制御
       window.addEventListener('scroll', function() {
         const pageTop = document.getElementById('page-top');
-        if (window.scrollY > 300) {
-          pageTop.classList.remove('d-none');
-        } else {
-          pageTop.classList.add('d-none');
+        if (pageTop) { 
+          if (window.scrollY > 300) {
+            pageTop.classList.remove('d-none');
+          } else {
+            pageTop.classList.add('d-none');
+          }
         }
       });
+
+      // showAlert, createAlertContainer は application.js から移動せず、application.jsが読み込まれることで利用可能にする
+      // copyShareUrl は app/views/posts/show.html.erb などに定義されているはずなので、ここでは定義しない
+      // あるいは、application.jsからexportして利用する
+      // グローバルにアクセス可能なinitMap関数 (Google Maps APIのコールバックとして使用)
+      // HanayamaReminder.map が必要であれば、initMapの外で定義しておく
+      window.HanayamaReminder = window.HanayamaReminder || {};
+      
+      // InfoWindow のコンテンツ作成 (initMapとaddMarkersToMapの前に定義が必要)
+      function createInfoWindowContent(location) {
+        return `
+          <div style="padding: 10px; max-width: 250px; font-family: 'Helvetica Neue', Arial, sans-serif;">
+            <h5 style="margin: 0 0 8px 0; color: #1f2937; font-weight: 600;">${location.name}</h5>
+            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
+              <strong>🌸 花:</strong> ${location.flower}
+            </p>
+            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
+              <strong>📍 難易度:</strong> ${location.difficulty || '未設定'}
+            </p>
+            ${location.days_left ? `
+              <p style="margin: 4px 0; color: #22c55e; font-size: 14px; font-weight: 600;">
+                <strong>⏰ 見頃まで:</strong> あと${location.days_left}日
+              </p>
+            ` : ''}
+            <div style="margin-top: 12px;">
+              <a href="/flower_mountains/${location.id}" 
+                 style="background: linear-gradient(135deg, #22c55e, #16a34a); 
+                        color: white; 
+                        padding: 6px 12px; 
+                        border-radius: 6px; 
+                        text-decoration: none; 
+                        font-size: 13px; 
+                        font-weight: 500;">
+                詳細を見る
+              </a>
+            </div>
+          </div>
+        `;
+      }
+
+      // マーカーを地図に追加 (initMapの前に定義が必要)
+      function addMarkersToMap(locations) {
+        const bounds = new google.maps.LatLngBounds();
+        
+        locations.forEach(location => {
+          if (location.lat && location.lng) {
+            const marker = new google.maps.Marker({
+              position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+              map: HanayamaReminder.map,
+              title: location.name,
+              icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                  <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="12" fill="#22c55e" stroke="#fff" stroke-width="2"/>
+                    <text x="16" y="20" text-anchor="middle" fill="white" font-size="16">🌸</text>
+                  </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+              }
+            });
+            
+            const infoWindow = new google.maps.InfoWindow({
+              content: createInfoWindowContent(location)
+            });
+            
+            marker.addListener('click', () => {
+              // 他のInfoWindowを閉じる
+              HanayamaReminder.markers.forEach(m => {
+                if (m.infoWindow) m.infoWindow.close();
+              });
+              
+              infoWindow.open(HanayamaReminder.map, marker);
+            });
+            
+            HanayamaReminder.markers.push({ marker, infoWindow });
+            bounds.extend(marker.getPosition());
+          }
+        });
+        
+        if (HanayamaReminder.markers.length > 0) {
+          HanayamaReminder.map.fitBounds(bounds);
+          
+          google.maps.event.addListenerOnce(HanayamaReminder.map, 'bounds_changed', () => {
+            if (HanayamaReminder.map.getZoom() > 12) {
+              HanayamaReminder.map.setZoom(12);
+            }
+          });
+        }
+      }
+
+      // 地図初期化（Google Maps APIのコールバックとして呼び出される）
+      window.initMap = function() {
+        const mapElement = document.getElementById('map');
+        if (!mapElement) return; // map要素がない場合は何もしない
+        
+        const center = { lat: 36.2048, lng: 138.2529 };
+        
+        HanayamaReminder.map = new google.maps.Map(mapElement, {
+          zoom: 6,
+          center: center,
+          styles: [
+            {
+              featureType: 'all',
+              elementType: 'geometry.fill',
+              stylers: [{ color: '#f0f9ff' }]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{ color: '#a7c6ed' }]
+            }
+          ]
+        });
+        
+        // mapDataがある場合にマーカーを追加
+        if (window.mapData) {
+          addMarkersToMap(window.mapData);
+        }
+      };
     </script>
   </body>
 </html>

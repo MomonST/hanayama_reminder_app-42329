@@ -55,7 +55,7 @@
                 <i class="bi bi-share me-1"></i>共有
               </button>
               
-              <% if user_signed_in? && (current_user == @post.user || current_user.admin?) %>
+              <% if user_signed_in? && (current_user == @post.user ) %>
                 <%= link_to edit_post_path(@post), class: "btn btn-outline-secondary ms-2" do %>
                   <i class="bi bi-pencil me-1"></i>編集
                 <% end %>

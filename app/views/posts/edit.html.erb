@@ -1,2 +1,70 @@
-<h1>Posts#edit</h1>
-<p>Find me in app/views/posts/edit.html.erb</p>
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "ホーム", root_path %></li>
+      <li class="breadcrumb-item"><%= link_to "投稿一覧", posts_path %></li>
+      <li class="breadcrumb-item"><%= link_to "投稿詳細", post_path(@post) %></li>
+      <li class="breadcrumb-item active" aria-current="page">投稿編集</li>
+    </ol>
+  </nav>
+  
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-lg">
+        <div class="card-header bg-gradient-to-r from-green-800 to-green-900 text-white py-3">
+          <h2 class="h4 mb-0 text-center">投稿を編集</h2>
+        </div>
+        
+        <div class="card-body p-4">
+          <%= form_with(model: @post, local: true, class: "needs-validation") do |f| %>
+            <% if @post.errors.any? %>
+              <div class="alert alert-danger mb-4">
+                <h5 class="alert-heading">エラーが発生しました</h5>
+                <ul class="mb-0">
+                  <% @post.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+            
+            <div class="mb-4">
+              <%= f.label :content, "投稿内容", class: "form-label" %>
+              <%= f.text_area :content, class: "form-control", rows: 4, placeholder: "花や山の様子、開花状況などを共有しましょう", required: true %>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <%= f.label :flower_mountain_id, "花と山", class: "form-label" %>
+                <%= f.collection_select :flower_mountain_id, @flower_mountains, :id, 
+                    ->(fm) { "#{fm.flower.name} (#{fm.mountain.name})" }, 
+                    { include_blank: "選択してください" }, 
+                    { class: "form-select", required: true } %>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <%= f.label :image_url, "画像", class: "form-label" %>
+              <div class="input-group mb-3">
+                <%= f.file_field :image_url, class: "form-control", accept: "image/*" %>
+              </div>
+              <div id="image-preview" class="text-center mt-2">
+                <% if @post.image_url.present? %>
+                  <div class="position-relative d-inline-block">
+                    <img src="<%= @post.image_url %>" class="img-thumbnail" style="max-height: 200px; max-width: 300px;">
+                  </div>
+                <% end %>
+              </div>
+              <small class="text-muted">※新しい画像をアップロードしない場合は、現在の画像がそのまま使用されます</small>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <%= f.submit "更新する", class: "btn btn-success btn-lg" %>
+              <%= link_to "キャンセル", post_path(@post), class: "btn btn-outline-secondary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

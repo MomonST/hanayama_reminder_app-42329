@@ -1,10 +1,7 @@
-// app/javascript/application.js の修正案 (Rails 7 + Importmap)
 
-// @hotwired/turbo-rails, @hotwired/stimulus は既存のまま
 import "@hotwired/turbo-rails"
 import "@hotwired/stimulus"
 import "controllers"
-
 // Bootstrap を importmap 経由で読み込む
 import * as bootstrap from "bootstrap"
 
@@ -20,25 +17,22 @@ import * as bootstrap from "bootstrap"
 // import "./my_custom_javascript_file"
 
 // グローバル変数
-window.HanayamaReminder = {
-  map: null,
-  markers: []
-};
+window.HanayamaReminder = window.HanayamaReminder || {}; // 複数箇所で定義されないよう調整
 
 // ページ読み込み時の処理
-document.addEventListener('turbolinks:load', function() {
+document.addEventListener('turbo:load', () => {
   initializeApp();
 });
 
 // アプリケーション初期化
 function initializeApp() {
-  initNotificationPopup();
-  initImagePreview();
-  initLikeButtons();
-  initFormValidation();
-  initTooltips();
-  initScrollAnimations();
-  initMobileMenu();
+  initNotificationPopup()
+  initImagePreview()
+  initLikeButtons()
+  initFormValidation()
+  initTooltips()
+  initScrollAnimations()
+  initMobileMenu()
 }
 
 // 通知ポップアップ
@@ -86,8 +80,8 @@ function initImagePreview() {
   });
 }
 
-// 画像プレビューをクリア
-function clearImagePreview() {
+// 画像プレビューをクリア (HTMLからも呼び出されるため、グローバルに公開)
+window.clearImagePreview = function() {
   const previewContainer = document.getElementById('image-preview');
   const fileInput = document.querySelector('input[type="file"][accept*="image"]');
   
@@ -225,7 +219,7 @@ function initMobileMenu() {
   }
 }
 
-// アラート表示
+// アラート表示 (他の場所からも呼び出されるため、グローバルスコープに残すか、特定のモジュールからexportする)
 function showAlert(message, type = 'info') {
   const alertContainer = document.getElementById('alert-container') || createAlertContainer();
   
@@ -256,119 +250,11 @@ function createAlertContainer() {
   return container;
 }
 
-// 地図初期化（Google Maps）
-function initMap() {
-  const mapElement = document.getElementById('map');
-  if (!mapElement) return;
-  
-  const center = { lat: 36.2048, lng: 138.2529 };
-  
-  HanayamaReminder.map = new google.maps.Map(mapElement, {
-    zoom: 6,
-    center: center,
-    styles: [
-      {
-        featureType: 'all',
-        elementType: 'geometry.fill',
-        stylers: [{ color: '#f0f9ff' }]
-      },
-      {
-        featureType: 'water',
-        elementType: 'geometry',
-        stylers: [{ color: '#a7c6ed' }]
-      }
-    ]
-  });
-  
-  // マーカーデータを取得して表示
-  if (window.mapData) {
-    addMarkersToMap(window.mapData);
-  }
-}
+// 地図初期化（Google Maps）はapplication.html.erb移動
 
-// マーカーを地図に追加
-function addMarkersToMap(locations) {
-  const bounds = new google.maps.LatLngBounds();
-  
-  locations.forEach(location => {
-    if (location.lat && location.lng) {
-      const marker = new google.maps.Marker({
-        position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
-        map: HanayamaReminder.map,
-        title: location.name,
-        icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="16" cy="16" r="12" fill="#22c55e" stroke="#fff" stroke-width="2"/>
-              <text x="16" y="20" text-anchor="middle" fill="white" font-size="16">🌸</text>
-            </svg>
-          `),
-          scaledSize: new google.maps.Size(32, 32)
-        }
-      });
-      
-      const infoWindow = new google.maps.InfoWindow({
-        content: createInfoWindowContent(location)
-      });
-      
-      marker.addListener('click', () => {
-        // 他のInfoWindowを閉じる
-        HanayamaReminder.markers.forEach(m => {
-          if (m.infoWindow) m.infoWindow.close();
-        });
-        
-        infoWindow.open(HanayamaReminder.map, marker);
-      });
-      
-      HanayamaReminder.markers.push({ marker, infoWindow });
-      bounds.extend(marker.getPosition());
-    }
-  });
-  
-  // 地図の表示範囲を調整
-  if (HanayamaReminder.markers.length > 0) {
-    HanayamaReminder.map.fitBounds(bounds);
-    
-    // ズームが近すぎる場合は調整
-    google.maps.event.addListenerOnce(HanayamaReminder.map, 'bounds_changed', () => {
-      if (HanayamaReminder.map.getZoom() > 12) {
-        HanayamaReminder.map.setZoom(12);
-      }
-    });
-  }
-}
+// マーカーを地図に追加はapplication.html.erb移動
 
-// InfoWindow のコンテンツ作成
-function createInfoWindowContent(location) {
-  return `
-    <div style="padding: 10px; max-width: 250px; font-family: 'Helvetica Neue', Arial, sans-serif;">
-      <h5 style="margin: 0 0 8px 0; color: #1f2937; font-weight: 600;">${location.name}</h5>
-      <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
-        <strong>🌸 花:</strong> ${location.flower}
-      </p>
-      <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
-        <strong>📍 難易度:</strong> ${location.difficulty || '未設定'}
-      </p>
-      ${location.days_left ? `
-        <p style="margin: 4px 0; color: #22c55e; font-size: 14px; font-weight: 600;">
-          <strong>⏰ 見頃まで:</strong> あと${location.days_left}日
-        </p>
-      ` : ''}
-      <div style="margin-top: 12px;">
-        <a href="/flower_mountains/${location.id}" 
-           style="background: linear-gradient(135deg, #22c55e, #16a34a); 
-                  color: white; 
-                  padding: 6px 12px; 
-                  border-radius: 6px; 
-                  text-decoration: none; 
-                  font-size: 13px; 
-                  font-weight: 500;">
-          詳細を見る
-        </a>
-      </div>
-    </div>
-  `;
-}
+// InfoWindow のコンテンツ作成はapplication.html.erb移動
 
 // ローディング表示
 function showLoading(element) {
@@ -384,8 +270,8 @@ function hideLoading(element, content) {
   }
 }
 
-// スムーススクロール
-function smoothScrollTo(target) {
+// スムーズスクロール (HTMLからも呼び出されるため、グローバルに公開)
+window.smoothScrollTo = function(target) {
   const element = document.querySelector(target);
   if (element) {
     element.scrollIntoView({
@@ -436,8 +322,10 @@ function initBeforeUnload() {
   });
 }
 
-// 初期化完了後の処理
+// 初期化完了後の処理 (DOMContentLoaded は turbo:load とは異なるタイミングで発火)
 document.addEventListener('DOMContentLoaded', function() {
+  // Turbo環境下でDOMReadyに依存する処理は turbo:load に移行するか、
+  // DOMContentLoadedとturbo:loadの両方で初期化関数を呼び出すなど工夫が必要
   initLazyLoading();
   initBeforeUnload();
 });
