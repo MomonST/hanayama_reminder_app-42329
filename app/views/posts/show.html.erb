@@ -128,7 +128,7 @@
             <% @related_posts.each do |post| %>
               <div class="d-flex mb-3">
                 <%= link_to post_path(post) do %>
-                  <%= image_tag post.image_url.presence || "/placeholder.svg?height=60&width=60", 
+                  <%= image_tag post.image_url.url.presence || "/placeholder.svg?height=60&width=60", 
                               class: "rounded me-2", 
                               style: "width: 60px; height: 60px; object-fit: cover;" %>
                 <% end %>

@@ -1,232 +1,290 @@
 <% if user_signed_in? %>
-  <!-- ログイン済みユーザー向けダッシュボード -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center py-4">
-          <h2 class="text-gradient mb-3">見頃の花を見逃さない</h2>
-          <p class="lead mb-4">
-            あなたの行きたいエリアの高山植物の開花時期を事前にお知らせ。<br>
-            忙しい日常でも、最高のタイミングで山の花に出会えます。
-          </p>
-          
-          <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-            <% @regions.each do |region| %>
-              <%= link_to region, root_path(region: region), 
-                  class: "btn #{@region == region ? 'btn-success' : 'btn-outline-success'} btn-sm" %>
-            <% end %>
+  <div class="container py-4">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm p-4">
+          <div class="card-body text-center py-4">
+            <h2 class="text-gradient mb-3 display-5 fw-bold">見頃の花を見逃さない</h2>
+            <p class="lead text-muted mb-4">
+              あなたの行きたいエリアの高山植物の開花時期を事前にお知らせ。<br>
+              忙しい日常でも、最高のタイミングで山の花に出会えます。
+            </p>
+            
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+              <% # @regionsはコントローラーで定義されていると仮定 %>
+              <% %w[北海道 東北 関東 中部 近畿 中国 四国 九州].each do |region| %>
+                <%= link_to region, root_path(region: region), 
+                    class: "btn #{(params[:region] == region || (!params[:region].present? && region == '関東')) ? 'btn-success' : 'btn-outline-success'} btn-sm shadow-sm" %>
+              <% end %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  
-  <!-- 通知カード -->
-  <h3 class="mb-3"><i class="bi bi-bell me-2"></i>あなたの通知</h3>
-  <div class="row mb-5">
-    <% if @notifications.any? %>
-      <% @notifications.each do |notification| %>
-        <div class="col-md-6 mb-4">
-          <div class="card border-start border-4 border-pink h-100 shadow-hover">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h5 class="card-title mb-0">
-                  <i class="bi bi-flower1 text-pink me-1"></i>
-                  <%= notification.flower_mountain.flower.name %>
-                </h5>
-                <span class="badge bg-light text-dark">
-                  <%= notification.flower_mountain.mountain.difficulty_level %>
-                </span>
-              </div>
-              
-              <p class="text-muted mb-2">
-                <i class="bi bi-geo-alt me-1"></i>
-                <%= notification.flower_mountain.mountain.name %> 
-                (<%= notification.flower_mountain.mountain.region %>)
-              </p>
-              
-              <div class="d-flex mt-3">
-                <div class="me-3">
-                  <% if notification.flower_mountain.flower.image_url.present? %>
-                    <%= image_tag notification.flower_mountain.flower.image_url, 
-                        class: "rounded", style: "width: 80px; height: 80px; object-fit: cover;" %>
-                  <% else %>
-                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                         style="width: 80px; height: 80px;">
-                      <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
-                    </div>
-                  <% end %>
+    
+    <h3 class="mb-3 mt-5"><i class="bi bi-bell me-2 text-pink"></i>あなたの通知</h3>
+    <div class="row mb-5">
+      <% if @notifications.any? %>
+        <% @notifications.each do |notification| %>
+          <div class="col-md-6 mb-4">
+            <div class="card border-start border-4 border-pink h-100 shadow-hover">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="card-title mb-0">
+                    <i class="bi bi-flower1 text-pink me-1"></i>
+                    <%= notification.flower_mountain.flower.name %>
+                  </h5>
+                  <span class="badge bg-light text-dark shadow-sm">
+                    <%= notification.flower_mountain.mountain.difficulty_level %>
+                  </span>
                 </div>
                 
-                <div>
-                  <% days_left = notification.flower_mountain.days_until_peak %>
-                  <% if days_left %>
-                    <div class="fs-4 fw-bold text-success mb-1">あと<%= days_left %>日</div>
-                    <p class="text-muted small mb-2">
-                      見頃予想: <%= notification.flower_mountain.peak_month %>月中旬
-                    </p>
-                  <% else %>
-                    <div class="fs-5 fw-bold text-muted mb-1">時期未定</div>
-                  <% end %>
-                  
-                  <div class="d-flex gap-2 mt-2">
-                    <a href="#" class="btn btn-sm btn-success">
-                      <i class="bi bi-calendar-plus me-1"></i>カレンダー
-                    </a>
-                    <%= link_to flower_mountain_path(notification.flower_mountain), class: "btn btn-sm btn-outline-secondary" do %>
-                      詳細
+                <p class="text-muted mb-2 small">
+                  <i class="bi bi-geo-alt me-1"></i>
+                  <%= notification.flower_mountain.mountain.name %> 
+                  (<%= notification.flower_mountain.mountain.region %>)
+                </p>
+                
+                <div class="d-flex mt-3">
+                  <div class="me-3">
+                    <% if notification.flower_mountain.flower.image.attached? && notification.flower_mountain.flower.image.persisted? %>
+                      <%= image_tag notification.flower_mountain.flower.image, 
+                          class: "rounded", style: "width: 80px; height: 80px; object-fit: cover;" %>
+                    <% else %>
+                      <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                           style="width: 80px; height: 80px;">
+                        <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                      </div>
                     <% end %>
+                  </div>
+                  
+                  <div>
+                    <% days_left = notification.flower_mountain.days_until_peak %>
+                    <% if days_left && days_left >= 0 %>
+                      <div class="fs-4 fw-bold text-success mb-1">あと<%= days_left %>日</div>
+                      <p class="text-muted small mb-2">
+                        見頃予想: <%= notification.flower_mountain.peak_month %>月中旬
+                      </p>
+                    <% else %>
+                      <div class="fs-5 fw-bold text-muted mb-1">時期未定</div>
+                    <% end %>
+                    
+                    <div class="d-flex gap-2 mt-2">
+                      <a href="#" class="btn btn-sm btn-success shadow-sm">
+                        <i class="bi bi-calendar-plus me-1"></i>カレンダー
+                      </a>
+                      <%= link_to flower_mountain_path(notification.flower_mountain), class: "btn btn-sm btn-outline-secondary shadow-sm" do %>
+                        詳細
+                      <% end %>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      <% end %>
-    <% else %>
-      <div class="col-12">
-        <div class="card border-0 bg-light">
-          <div class="card-body text-center py-5">
-            <i class="bi bi-bell-slash text-muted mb-3" style="font-size: 2rem;"></i>
-            <h5>通知が設定されていません</h5>
-            <p class="text-muted">花山スポットを選んで通知を設定しましょう</p>
-            <%= link_to "花登山マップを見る", flower_mountains_path, class: "btn btn-success mt-2" %>
+        <% end %>
+      <% else %>
+        <div class="col-12">
+          <div class="card border-0 bg-light">
+            <div class="card-body text-center py-5">
+              <i class="bi bi-bell-slash text-muted mb-3" style="font-size: 2.5rem;"></i>
+              <h5>通知が設定されていません</h5>
+              <p class="text-muted">花山スポットを選んで通知を設定しましょう</p>
+              <%= link_to "花登山マップを見る", flower_mountains_path, class: "btn btn-success mt-2 shadow-sm" %>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <!-- 地域の花山スポット -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3><i class="bi bi-geo-alt me-2"></i><%= @region %>の花山スポット</h3>
-    <%= link_to "すべて見る", flower_mountains_path(region: @region), class: "btn btn-sm btn-outline-success" %>
-  </div>
-  
-  <div class="row mb-5">
-    <% if @flower_mountains.any? %>
-      <% @flower_mountains.each do |fm| %>
-        <div class="col-md-4 col-sm-6 mb-4">
-          <%= link_to flower_mountain_path(fm), class: "text-decoration-none" do %>
-            <div class="card border-0 shadow-sm h-100 hover-card">
-              <% if fm.mountain.image_url.present? %>
-                <%= image_tag fm.mountain.image_url, class: "card-img-top", style: "height: 160px; object-fit: cover;" %>
-              <% else %>
-                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
-                  <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
-                </div>
-              <% end %>
-              
-              <div class="card-body">
-                <h5 class="card-title mb-1"><%= fm.mountain.name %></h5>
-                <p class="text-muted mb-2">
-                  <i class="bi bi-flower1 me-1"></i><%= fm.flower.name %>
-                </p>
+      <% end %>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+      <h3><i class="bi bi-geo-alt me-2 text-pink"></i><%= @region %>の花山スポット</h3>
+      <%= link_to "すべて見る", flower_mountains_path(region: @region), class: "btn btn-sm btn-outline-success shadow-sm" %>
+    </div>
+    
+    <div class="row mb-5">
+      <% if @flower_mountains.any? %>
+        <% @flower_mountains.each do |fm| %>
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
+            <%= link_to flower_mountain_path(fm), class: "text-decoration-none" do %>
+              <div class="card border-0 shadow-sm h-100 hover-card">
+                <% if fm.mountain.image.attached? && fm.mountain.image.persisted? %>
+                  <%= image_tag fm.mountain.image, class: "card-img-top", style: "height: 180px; object-fit: cover;" %>
+                <% else %>
+                  <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                    <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
+                  </div>
+                <% end %>
                 
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="badge bg-light text-dark">
-                    <%= fm.mountain.difficulty_level %>
-                  </span>
+                <div class="card-body">
+                  <h5 class="card-title mb-1"><%= fm.mountain.name %></h5>
+                  <p class="text-muted mb-2 small">
+                    <i class="bi bi-flower1 me-1"></i><%= fm.flower.name %>
+                  </p>
                   
-                  <% days_left = fm.days_until_peak %>
-                  <% if days_left %>
-                    <span class="text-success fw-bold">あと<%= days_left %>日</span>
-                  <% else %>
-                    <span class="text-muted">時期未定</span>
-                  <% end %>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-light text-dark shadow-sm">
+                      <%= fm.mountain.difficulty_level %>
+                    </span>
+                    
+                    <% days_left = fm.days_until_peak %>
+                    <% if days_left && days_left >= 0 %>
+                      <span class="text-success fw-bold">あと<%= days_left %>日</span>
+                    <% else %>
+                      <span class="text-muted">時期未定</span>
+                    <% end %>
+                  </div>
                 </div>
               </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="col-12">
+          <div class="card border-0 bg-light">
+            <div class="card-body text-center py-5">
+              <i class="bi bi-geo-alt-fill text-muted mb-3" style="font-size: 2.5rem;"></i>
+              <h5>この地域のスポットはまだ登録されていません</h5>
+              <p class="text-muted">別の地域を選択してみましょう</p>
             </div>
-          <% end %>
-        </div>
-      <% end %>
-    <% else %>
-      <div class="col-12">
-        <div class="card border-0 bg-light">
-          <div class="card-body text-center py-5">
-            <i class="bi bi-geo-alt-fill text-muted mb-3" style="font-size: 2rem;"></i>
-            <h5>この地域のスポットはまだ登録されていません</h5>
-            <p class="text-muted">別の地域を選択してみましょう</p>
           </div>
         </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <!-- 人気の投稿 -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3><i class="bi bi-camera me-2"></i>人気の投稿</h3>
-    <%= link_to "すべて見る", posts_path(sort: "popular"), class: "btn btn-sm btn-outline-success" %>
-  </div>
-  
-  <div class="row">
-    <% if @popular_posts.any? %>
-      <% @popular_posts.each do |post| %>
-        <div class="col-md-4 mb-4">
-          <%= link_to post_path(post), class: "text-decoration-none" do %>
-            <div class="card border-0 shadow-sm h-100 hover-card">
-              <% if post.image_url.present? %>
-                <%= image_tag post.image_url.url, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
-              <% else %>
-                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                  <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
-                </div>
-              <% end %>
-              
-              <div class="card-body">
-                <h6 class="card-title mb-1">
-                  <%= post.flower_mountain.mountain.name %> - <%= post.flower_mountain.flower.name %>
-                </h6>
-                <p class="text-muted small mb-2">
-                  <i class="bi bi-person-circle me-1"></i><%= post.user.nickname %>
-                </p>
+      <% end %>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+      <h3><i class="bi bi-camera me-2 text-pink"></i>人気の投稿</h3>
+      <%= link_to "すべて見る", posts_path(sort: "popular"), class: "btn btn-sm btn-outline-success shadow-sm" %>
+    </div>
+    
+    <div class="row pb-5">
+      <% if @popular_posts.any? %>
+        <% @popular_posts.each do |post| %>
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
+            <%= link_to post_path(post), class: "text-decoration-none" do %>
+              <div class="card border-0 shadow-sm h-100 hover-card">
+                <% if post.image.attached? && post.image.persisted? %>
+                  <%= image_tag post.image, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
+                <% else %>
+                  <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
+                  </div>
+                <% end %>
                 
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="text-pink">
-                    <i class="bi bi-heart-fill me-1"></i><%= post.likes_count %>
-                  </span>
-                  <small class="text-muted">
-                    <%= l post.created_at, format: :short %>
-                  </small>
+                <div class="card-body">
+                  <h6 class="card-title mb-1">
+                    <%= post.flower_mountain.mountain.name %> - <%= post.flower_mountain.flower.name %>
+                  </h6>
+                  <p class="text-muted small mb-2">
+                    <i class="bi bi-person-circle me-1"></i><%= post.user.nickname %>
+                  </p>
+                  
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-pink">
+                      <i class="bi bi-heart-fill me-1"></i><%= post.likes_count %>
+                    </span>
+                    <small class="text-muted">
+                      <%= l post.created_at, format: :short %>
+                    </small>
+                  </div>
                 </div>
               </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="col-12">
+          <div class="card border-0 bg-light">
+            <div class="card-body text-center py-5">
+              <i class="bi bi-camera text-muted mb-3" style="font-size: 2.5rem;"></i>
+              <h5>まだ投稿がありません</h5>
+              <p class="text-muted">あなたが最初の投稿者になりましょう！</p>
+              <%= link_to "投稿する", new_post_path, class: "btn btn-pink mt-2 shadow-sm" %>
             </div>
-          <% end %>
-        </div>
-      <% end %>
-    <% else %>
-      <div class="col-12">
-        <div class="card border-0 bg-light">
-          <div class="card-body text-center py-5">
-            <i class="bi bi-camera text-muted mb-3" style="font-size: 2rem;"></i>
-            <h5>まだ投稿がありません</h5>
-            <p class="text-muted">あなたが最初の投稿者になりましょう！</p>
-            <%= link_to "投稿する", new_post_path, class: "btn btn-pink mt-2" %>
           </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
   
 <% else %>
-  <!-- CTA セクション -->
-  <!-- 未ログインユーザー向けランディングページ -->
-    <section class="text-center py-5">
+  <div class="gradient-bg pt-5 pb-5">
+    <div class="container text-center py-5 fade-in-up">
       <div class="row justify-content-center">
-        <div class="col-lg-6">
-          <div class="card border-0 shadow-lg bg-gradient-to-r from-green-50 to-pink-50">
-            <div class="card-body p-5">
-              <h3 class="text-gradient mb-3">今すぐ始めよう</h3>
-              <p class="text-muted mb-4">
-                無料で登録して、あなただけの花山リマインダーを設定しましょう。
-                見頃の花を見逃すことはもうありません。
+        <div class="col-lg-10">
+          <h1 class="display-4 fw-bold mb-4 text-gradient">
+            あなたの旅を、最高の瞬間に。
+          </h1>
+          <p class="lead mb-5 text-muted">
+            「Hanayama Reminder」は、高山植物の開花時期を事前に通知し、<br class="d-none d-md-block">
+            忙しいあなたでも、最高のタイミングで感動的な山の花に出会えるようサポートします。
+          </p>
+          <%= link_to new_user_registration_path, class: "btn btn-pink btn-lg shadow-lg mb-5" do %>
+            <i class="bi bi-person-plus me-2"></i>無料で始める
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <section class="py-5">
+      <h2 class="text-center fw-bold mb-5">Hanayama Reminderの<span class="text-gradient">3つの特徴</span></h2>
+      <div class="row text-center">
+        <div class="col-md-4 mb-4 fade-in-up" style="animation-delay: 0.2s;">
+          <div class="feature-icon bg-pink-light rounded-circle mb-4">
+            <i class="bi bi-bell-fill text-pink"></i>
+          </div>
+          <h4 class="fw-bold mb-3">開花時期リマインダー</h4>
+          <p class="text-muted">
+            登録した高山植物の開花予想時期の1ヶ月前と1週間前に通知します。
+            見頃のピークを逃さず、計画的に準備を進められます。
+          </p>
+        </div>
+        <div class="col-md-4 mb-4 fade-in-up" style="animation-delay: 0.4s;">
+          <div class="feature-icon bg-green-light rounded-circle mb-4">
+            <i class="bi bi-map-fill text-success"></i>
+          </div>
+          <h4 class="fw-bold mb-3">詳細な花山情報</h4>
+          <p class="text-muted">
+            各花山スポットの標高、難易度、アクセス情報などを網羅。
+            初心者からベテランまで、あなたにぴったりの山を見つけられます。
+          </p>
+        </div>
+        <div class="col-md-4 mb-4 fade-in-up" style="animation-delay: 0.6s;">
+          <div class="feature-icon bg-blue-light rounded-circle mb-4">
+            <i class="bi bi-images text-primary"></i>
+          </div>
+          <h4 class="fw-bold mb-3">美しい写真と投稿</h4>
+          <p class="text-muted">
+            ユーザーが共有する高山植物の美しい写真や登山記録を閲覧。
+            次の目的地を見つけたり、感動を共有したりできます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="my-5">
+
+    <section class="text-center py-5 fade-in-up">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-lg p-5 bg-gradient-green-pink text-white">
+            <div class="card-body">
+              <h2 class="display-6 fw-bold mb-4">
+                最高の瞬間を、逃さないために。
+              </h2>
+              <p class="lead mb-5">
+                今すぐHanayama Reminderを始めて、<br class="d-none d-md-block">
+                感動的な高山植物との出会いを手に入れましょう。
               </p>
-              <%= link_to new_user_registration_path, class: "btn btn-success btn-lg" do %>
-                <i class="bi bi-person-plus me-2"></i>無料で始める
+              <%= link_to new_user_registration_path, class: "btn btn-light btn-lg text-pink fw-bold shadow-lg" do %>
+                <i class="bi bi-person-plus me-2"></i>無料でアカウント作成
               <% end %>
             </div>
           </div>
         </div>
       </div>
     </section>
+  </div>
 <% end %>

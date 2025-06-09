@@ -37,7 +37,7 @@ class Mountain < ApplicationRecord
     lat, lng = coordinates
     # 簡易的な距離計算（実際はもっと複雑な計算が必要）
     where("
-      (latitude - ?)^2 + (longitude - ?)^2 < ?",
+      POW(latitude - ?, 2) + POW(longitude - ?, 2) < ?",
       lat, lng, (distance_km / 111.0)**2
     )
   }

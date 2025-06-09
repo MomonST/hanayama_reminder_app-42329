@@ -66,7 +66,7 @@
           <div class="card border-0 shadow-sm hover-card h-100">
             <div class="position-relative">
               <%= link_to post_path(post) do %>
-                <%= image_tag post.image_url.presence || "/placeholder.svg?height=250&width=400", 
+                <%= image_tag post.image_url.url.presence || "/placeholder.svg?height=250&width=400", 
                             class: "card-img-top", 
                             style: "height: 250px; object-fit: cover;" %>
               <% end %>
@@ -74,12 +74,16 @@
               <!-- いいねボタン -->
               <div class="position-absolute top-0 end-0 m-2">
                 <% if user_signed_in? %>
-                  <%= link_to like_post_path(post), method: :post, 
-                              class: "like-button btn btn-sm #{'btn-danger' if current_user.likes.exists?(post: post)} #{'btn-outline-light' unless current_user.likes.exists?(post: post)}", 
-                              data: { remote: true } do %>
-                    <i class="fas fa-heart"></i>
-                    <span class="like-count"><%= post.likes_count %></span>
-                  <% end %>
+                  <%# いいねボタンのロジックを一時的にコメントアウト %>
+                  <%#= link_to like_post_path(post),
+                              class: "like-button btn btn-sm #{current_user.likes.exists?(post: post) ? 'btn-danger' : 'btn-outline-light'}",
+                              data: {
+                                turbo_method: :post # initLikeButtons で使用される method 属性
+                              } do  %>
+                    <i class="fas fa-heart <%#= current_user.likes.exists?(post: post) ? 'text-white' : 'text-danger' %>"></i>
+                    <span class="like-count"><%#= post.likes_count %></span>
+                  <%# end %>
+
                 <% else %>
                   <button class="btn btn-sm btn-outline-light" disabled>
                     <i class="far fa-heart"></i>
@@ -90,14 +94,14 @@
               
               <!-- 花・山バッジ -->
               <div class="position-absolute bottom-0 start-0 m-2">
-                <% if post.flower %>
+                <% if post.flower_mountain&.flower %>
                   <span class="badge bg-pink me-1">
-                    <i class="fas fa-seedling me-1"></i><%= post.flower.name %>
+                    <i class="fas fa-seedling me-1"></i><%= post.flower_mountain.flower.name %>
                   </span>
                 <% end %>
-                <% if post.mountain %>
+                <% if post.flower_mountain&.mountain %>
                   <span class="badge bg-success">
-                    <i class="fas fa-mountain me-1"></i><%= post.mountain.name %>
+                    <i class="fas fa-mountain me-1"></i><%= post.flower_mountain.mountain.name %>
                   </span>
                 <% end %>
               </div>

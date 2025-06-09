@@ -9,23 +9,21 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
     
-    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Animate.css for animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     
-    <!-- Stylesheets -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     
-    <!-- JavaScript -->
     <%= javascript_importmap_tags %>
-
-    <!-- Google Maps API -->
-    <% if content_for?(:use_google_maps) %>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eOzrKbFN/LA" crossorigin="anonymous"></script>
+    
+    <% if content_for?(:use_Maps) %>
       <script>
         // @map_data が定義されていて、かつ空でない場合のみ window.mapData を設定する
         <% if defined?(@map_data) && @map_data.present? %>
@@ -34,25 +32,56 @@
           window.mapData = []; // データがない場合は空の配列を設定する
         <% end %>
       </script>
-      <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer>
+      <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['Maps_API_KEY'] %>&callback=initMap&libraries=places" async defer>
       </script>
     <% end %>
     
   </head>
 
-  <body class="gradient-bg">
-    <!-- ヘッダー -->
-    <%= render 'shared/header' %>
-    
-    <!-- 通知ポップアップ（ログイン前のみ） -->
+  <body class="min-vh-100 d-flex flex-column gradient-bg">
     <% unless user_signed_in? %>
       <%= render 'shared/notification_popup' %>
     <% end %>
     
-    <!-- アラート表示エリア -->
+    <%= render 'shared/login_prompt_modal' %>
+    
+    <header class="bg-white bg-opacity-90 shadow-sm border-bottom border-green-100">
+      <div class="container-fluid px-4 px-sm-6 px-lg-8 mx-auto" style="max-width: 1280px;">
+        <div class="d-flex justify-content-between align-items-center" style="height: 64px;">
+          <div class="d-flex align-items-center me-2">
+            <i class="bi bi-mountain fs-3 text-success"></i>
+            <h1 class="fs-4 fw-bold ms-2 site-title-gradient">
+              花山リマインダー
+            </h1>
+          </div>
+          <div class="d-flex align-items-center ms-3">
+            <%= link_to "#", class: "btn btn-sm btn-gradient-pink me-2", data: { bs_toggle: "modal", bs_target: "#loginPromptModal", user_logged_in: user_signed_in?.to_s } do %>
+              <i class="bi bi-upload me-1"></i>
+              リアルタイム投稿
+            <% end %>
+            
+            <% if user_signed_in? %>
+              <%= link_to notifications_path, class: "btn btn-link text-dark p-1 me-1" do %>
+                <i class="bi bi-bell fs-5"></i>
+              <% end %>
+              <%= link_to destroy_user_session_path, data: { turbo_method: :delete }, class: "btn btn-link text-dark p-1" do %>
+                ログアウト
+              <% end %>
+            <% else %>
+              <%= link_to new_user_session_path, class: "btn btn-link text-dark p-1 me-1", data: { bs_toggle: "modal", bs_target: "#loginPromptModal" } do %>
+                ログイン
+              <% end %>
+              <%= link_to new_user_registration_path, class: "btn btn-sm btn-success" do %>
+                新規登録
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </header>
+
     <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
     
-    <!-- フラッシュメッセージ -->
     <% if notice %>
       <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
         <i class="bi bi-check-circle me-2"></i>
@@ -69,20 +98,32 @@
       </div>
     <% end %>
     
-    <!-- メインコンテンツ -->
-    <main class="container-fluid px-3 px-md-4 py-4">
+    <main class="container-fluid px-3 px-md-4 py-4 flex-grow-1" style="max-width: 1280px;">
       <%= yield %>
     </main>
     
-    <!-- フッター -->
-    <%= render 'shared/footer' %>
+    <footer class="bg-dark text-white py-4 mt-auto">
+      <div class="container text-center">
+        <p>&copy; 2024 花山リマインダー. All rights reserved.</p>
+      </div>
+    </footer>
     
-    <!-- ページトップボタン -->
     <button id="page-top" class="btn btn-success position-fixed bottom-0 end-0 m-4 rounded-circle d-none" style="width: 50px; height: 50px; z-index: 1000;" onclick="smoothScrollTo('body')">
       <i class="bi bi-arrow-up"></i>
     </button>
     
     <script>
+      // smoothScrollTo 関数はそのまま残します
+      function smoothScrollTo(targetId) {
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop,
+            behavior: 'smooth'
+          });
+        }
+      }
+
       // グローバル変数 HanayamaReminder の初期化は一度だけ
       window.HanayamaReminder = window.HanayamaReminder || { map: null, markers: [] };
 
@@ -97,12 +138,6 @@
           }
         }
       });
-
-      // showAlert, createAlertContainer は application.js から移動せず、application.jsが読み込まれることで利用可能にする
-      // copyShareUrl は app/views/posts/show.html.erb などに定義されているはずなので、ここでは定義しない
-      // あるいは、application.jsからexportして利用する
-      // グローバルにアクセス可能なinitMap関数 (Google Maps APIのコールバックとして使用)
-      // HanayamaReminder.map が必要であれば、initMapの外で定義しておく
       
       // InfoWindow のコンテンツ作成 (initMapとaddMarkersToMapの前に定義が必要)
       function createInfoWindowContent(location) {
@@ -204,18 +239,17 @@
           return;
         }
 
+        // ページをロードするたびに新しいマップ要素が生成される場合、既存のマップインスタンスを再利用するか、破棄して再作成する
         // 既存のマップインスタンスが存在し、かつ新しいマップ要素に紐付いていない場合は破棄
         if (window.HanayamaReminder && window.HanayamaReminder.map && 
           window.HanayamaReminder.map.getDiv() !== mapElement) {
-          // 既存のマップが別のDOM要素に紐づいている場合、新しいマップを作成するために古いマップを破棄
-          // Google Maps APIでは直接mapを破棄するメソッドはないため、参照をnullにする
-          // (メモリリークの可能性はありますが、一般的にはGCが処理します)
-          window.HanayamaReminder.map = null; 
+          window.HanayamaReminder.map = null; // 古いマップインスタンスを破棄
         }
 
         // mapがまだ初期化されていないか、または新しいmap要素に初期化する必要がある場合
         if (!window.HanayamaReminder.map || window.HanayamaReminder.map.getDiv() !== mapElement) {
-          const center = { lat: 36.2048, lng: 138.2529 }; window.HanayamaReminder.map = new google.maps.Map(mapElement, {
+          const center = { lat: 36.2048, lng: 138.2529 }; 
+          window.HanayamaReminder.map = new google.maps.Map(mapElement, {
             zoom: 6,
             center: center,
             styles: [
@@ -234,7 +268,6 @@
         }
         
         // マーカーの追加は、マップが初期化された後に行う
-        // HanayamaReminder.markers をクリアしてから追加
         if (window.HanayamaReminder.map && window.mapData && window.mapData.length > 0) {
           addMarkersToMap(window.mapData);
         }
@@ -248,9 +281,44 @@
           initMap();
         }
       });
+      // ログイン促進モーダルを制御するJavaScript (application.jsには移動させない)
+      document.addEventListener('DOMContentLoaded', () => {
+        const loginPromptModal = new bootstrap.Modal(document.getElementById('loginPromptModal'));
 
-      // Turbo Driveがページを「復元」する際に、イベントリスナーが二重に登録されるのを防ぐ
-      // (initMap内のイベントリスナーは、addMarkersToMap内でmarkers配列をクリアしているので問題ないはず)
+        // リアルタイム投稿ボタンのイベントリスナー
+        document.querySelectorAll('.btn-gradient-pink').forEach(button => {
+          button.addEventListener('click', (event) => {
+            const userLoggedIn = event.currentTarget.dataset.userLoggedIn === 'true';
+            if (!userLoggedIn) {
+              event.preventDefault(); // リンクのデフォルト動作を停止
+              loginPromptModal.show();
+            }
+            // else {
+            //   // ログイン済みの場合は、リアルタイム投稿画面への遷移を許可
+            //   // このボタンがフォームやAjaxリクエストで投稿するのではなく、
+            //   // 画面遷移を目的としている場合は、リンクのhrefを適切に設定する
+            // }
+          });
+        });
+
+        // ログインボタンのイベントリスナー (ヘッダーの「ログイン」ボタン)
+        document.querySelectorAll('a[href="/users/sign_in"]').forEach(link => {
+          link.addEventListener('click', (event) => {
+            event.preventDefault(); // デフォルトのログインページへの遷移を防ぐ
+            loginPromptModal.show(); // モーダルを表示
+          });
+        });
+
+        // モーダル内の「新規登録」ボタンのイベントリスナー
+        document.getElementById('modalSignUpButton').addEventListener('click', () => {
+          window.location.href = '/users/sign_up';
+        });
+
+        // モーダル内の「ログイン」ボタンのイベントリスナー
+        document.getElementById('modalLoginButton').addEventListener('click', () => {
+          window.location.href = '/users/sign_in';
+        });
+      });
     </script>
   </body>
 </html>

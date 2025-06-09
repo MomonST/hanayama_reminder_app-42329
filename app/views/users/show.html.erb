@@ -108,20 +108,20 @@
                   <div class="card border-0 shadow-sm hover-card h-100">
                     <div class="position-relative">
                       <%= link_to post_path(post) do %>
-                        <%= image_tag post.image_url.presence || "/placeholder.svg?height=200&width=300", 
+                        <%= image_tag post.image_url.url.presence || "/placeholder.svg?height=200&width=300", 
                                     class: "card-img-top", 
                                     style: "height: 200px; object-fit: cover;" %>
                       <% end %>
                       
                       <div class="position-absolute bottom-0 start-0 m-2">
-                        <% if post.flower %>
+                        <% if post.flower_mountain&.flower %>
                           <span class="badge bg-pink me-1">
-                            <i class="fas fa-seedling me-1"></i><%= post.flower.name %>
+                            <i class="fas fa-seedling me-1"></i><%= post.flower_mountain.flower.name %>
                           </span>
                         <% end %>
-                        <% if post.mountain %>
+                        <% if post.flower_mountain&.mountain %>
                           <span class="badge bg-success">
-                            <i class="fas fa-mountain me-1"></i><%= post.mountain.name %>
+                            <i class="fas fa-mountain me-1"></i><%= post.flower_mountain.mountain.name %>
                           </span>
                         <% end %>
                       </div>
@@ -225,7 +225,7 @@
                   <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card border-0 shadow-sm hover-card h-100">
                       <%= link_to post_path(post) do %>
-                        <%= image_tag post.image_url.presence || "/placeholder.svg?height=200&width=300", 
+                        <%= image_tag post.image_url.url.presence || "/placeholder.svg?height=200&width=300", 
                                     class: "card-img-top", 
                                     style: "height: 200px; object-fit: cover;" %>
                       <% end %>

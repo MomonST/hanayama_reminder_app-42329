@@ -174,14 +174,14 @@
     </div>
   <% end %>
 
-  <!-- (追加実装の場合)管理者用ボタン && current_user.admin? -->
-  <% if user_signed_in? %> 
+  <!-- (追加実装の場合)管理者用ボタン && current_user.admin? 
+  <%# if user_signed_in? %> 
     <div class="position-fixed bottom-0 end-0 m-4">
-      <%= link_to new_flower_path, class: "btn btn-success rounded-circle shadow-lg", 
+      <%# = link_to new_flower_path, class: "btn btn-success rounded-circle shadow-lg", 
                  style: "width: 60px; height: 60px;", 
                  data: { bs_toggle: "tooltip", bs_title: "新しい花を追加" } do %>
         <i class="bi bi-plus-lg"></i>
-      <% end %>
+      <%# end %>
     </div>
-  <% end %>
-</div>
+  <%# end %>
+</div> -->

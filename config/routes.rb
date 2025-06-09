@@ -46,7 +46,7 @@ Rails.application.routes.draw do
   end
 
   # お気に入りリソース (FlowerMountainへのいいねとは別に、ユーザーのお気に入り管理ならこのまま)
-  resources :favorites, only: [:index, :show, :create, :destroy] do
+  resources :favorites, only: [:index, :create, :destroy] do
     collection do
       post 'toggle/:flower_mountain_id', to: 'favorites#toggle', as: :toggle
     end
