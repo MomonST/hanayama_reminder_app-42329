@@ -50,12 +50,12 @@
         <div class="d-flex justify-content-between align-items-center" style="height: 64px;">
           <div class="d-flex align-items-center me-2">
             <i class="bi bi-mountain fs-3 text-success"></i>
-            <h1 class="fs-4 fw-bold ms-2 site-title-gradient">
+            <h1 class="fs-4 fw-bold ms-2 text-gradient">
               花山リマインダー
             </h1>
           </div>
           <div class="d-flex align-items-center ms-3">
-            <%= link_to "#", class: "btn btn-sm btn-gradient-pink me-2", data: { bs_toggle: "modal", bs_target: "#loginPromptModal", user_logged_in: user_signed_in?.to_s } do %>
+            <%= link_to new_post_path, class: "btn btn-sm btn-gradient-pink me-2", data: { bs_toggle: "modal", bs_target: "#loginPromptModal", user_logged_in: user_signed_in?.to_s } do %>
               <i class="bi bi-upload me-1"></i>
               リアルタイム投稿
             <% end %>

@@ -11,7 +11,7 @@
             </p>
             
             <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-              <% # @regionsはコントローラーで定義されていると仮定 %>
+              <%# @regionsはコントローラーで定義%>
               <% %w[北海道 東北 関東 中部 近畿 中国 四国 九州].each do |region| %>
                 <%= link_to region, root_path(region: region), 
                     class: "btn #{(params[:region] == region || (!params[:region].present? && region == '関東')) ? 'btn-success' : 'btn-outline-success'} btn-sm shadow-sm" %>
@@ -47,8 +47,8 @@
                 
                 <div class="d-flex mt-3">
                   <div class="me-3">
-                    <% if notification.flower_mountain.flower.image.attached? && notification.flower_mountain.flower.image.persisted? %>
-                      <%= image_tag notification.flower_mountain.flower.image, 
+                    <% if notification.flower_mountain.flower.image_url.present? %>
+                      <%= image_tag notification.flower_mountain.flower.image_url, 
                           class: "rounded", style: "width: 80px; height: 80px; object-fit: cover;" %>
                     <% else %>
                       <div class="bg-light rounded d-flex align-items-center justify-content-center" 
@@ -108,8 +108,8 @@
           <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
             <%= link_to flower_mountain_path(fm), class: "text-decoration-none" do %>
               <div class="card border-0 shadow-sm h-100 hover-card">
-                <% if fm.mountain.image.attached? && fm.mountain.image.persisted? %>
-                  <%= image_tag fm.mountain.image, class: "card-img-top", style: "height: 180px; object-fit: cover;" %>
+                <% if fm.mountain.image_url.present? %>
+                  <%= image_tag fm.mountain.image_url, class: "card-img-top", style: "height: 180px; object-fit: cover;" %>
                 <% else %>
                   <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
                     <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
@@ -163,8 +163,8 @@
           <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
             <%= link_to post_path(post), class: "text-decoration-none" do %>
               <div class="card border-0 shadow-sm h-100 hover-card">
-                <% if post.image.attached? && post.image.persisted? %>
-                  <%= image_tag post.image, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
+                <% if post.image_url.present? %>
+                  <%= image_tag post.image_url.url, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
                 <% else %>
                   <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                     <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
