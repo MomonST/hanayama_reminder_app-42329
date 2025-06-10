@@ -1,67 +1,72 @@
-<% content_for :use_Maps, true %>
+<%# Google Maps APIを使うビューであることをレイアウトに伝える %>
+<% content_for :use_google_maps, true %>
 
-<div class="container py-4">
-  <div class="text-center mb-5 fade-in-up">
-    <h1 class="display-5 text-gradient fw-bold mb-3">⛰️ 山の一覧</h1>
-    <p class="lead text-muted">
-      花が見られる山々を探索しましょう
-    </p>
-  </div>
-  
-  <div class="row g-3 mb-5 fade-in-up" style="animation-delay: 0.2s;">
-    <div class="col-6 col-md-3">
-      <div class="card border-0 bg-green-light text-center shadow-sm h-100">
-        <div class="card-body py-3">
-          <h3 class="text-success mb-1 fw-bold"><%= @total_mountains %></h3>
-          <small class="text-muted">登録山数</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 bg-blue-light text-center shadow-sm h-100">
-        <div class="card-body py-3">
-          <h3 class="text-primary mb-1 fw-bold"><%= @regions.count %></h3>
-          <small class="text-muted">対応地域</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 bg-pink-light text-center shadow-sm h-100">
-        <div class="card-body py-3">
-          <h3 class="text-pink mb-1 fw-bold"><%= @max_elevation %>m</h3>
-          <small class="text-muted">最高標高</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 bg-warning bg-opacity-25 text-center shadow-sm h-100">
-        <div class="card-body py-3">
-          <h3 class="text-warning mb-1 fw-bold"><%= @min_elevation %>m</h3>
-          <small class="text-muted">最低標高</small>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-5 fade-in-up" style="animation-delay: 0.4s;">
+<div class="container-fluid">
+  <!-- ヘッダーセクション -->
+  <div class="row mb-4">
     <div class="col-12">
-      <div class="card border-0 shadow-lg">
-        <div class="card-body py-4">
-          <%= form_with url: mountains_path, method: :get, local: true, class: "row g-3 align-items-end" do |f| %>
-            <div class="col-md-3 col-lg-3">
-              <label for="mountain_search" class="form-label small text-muted mb-1">山の名前</label>
-              <%= f.text_field :search, placeholder: "例: 富士山", 
-                              value: params[:search], 
-                              class: "form-control form-control-sm", id: "mountain_search" %>
+      <div class="text-center mb-4">
+        <h1 class="display-5 text-gradient mb-3">⛰️ 山の一覧</h1>
+        <p class="lead text-muted">
+          花が見られる山々を探索しましょう
+        </p>
+      </div>
+      
+      <!-- 統計情報 -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-green-light text-center">
+            <div class="card-body py-3">
+              <h3 class="text-success mb-1"><%= @total_mountains %></h3>
+              <small class="text-muted">登録山数</small>
             </div>
-            <div class="col-md-3 col-lg-2">
-              <label for="region" class="form-label small text-muted mb-1">地域</label>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-blue-light text-center">
+            <div class="card-body py-3">
+              <h3 class="text-primary mb-1"><%= @regions.count %></h3>
+              <small class="text-muted">対応地域</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-pink-light text-center">
+            <div class="card-body py-3">
+              <h3 class="text-pink mb-1"><%= @max_elevation %>m</h3>
+              <small class="text-muted">最高標高</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 bg-warning bg-opacity-25 text-center">
+            <div class="card-body py-3">
+              <h3 class="text-warning mb-1"><%= @min_elevation %>m</h3>
+              <small class="text-muted">最低標高</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 検索・フィルターセクション -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <%= form_with url: mountains_path, method: :get, local: true, class: "row g-3" do |f| %>
+            <div class="col-md-3">
+              <%= f.text_field :search, placeholder: "山の名前で検索", 
+                              value: params[:search], 
+                              class: "form-control" %>
+            </div>
+            <div class="col-md-2">
               <%= f.select :region, 
                           options_for_select([['すべての地域', '']] + @regions.map { |r| [r, r] }, params[:region]),
-                          {}, { class: "form-select form-select-sm", id: "region" } %>
+                          {}, { class: "form-select" } %>
             </div>
-            <div class="col-md-2 col-lg-2">
-              <label for="difficulty" class="form-label small text-muted mb-1">難易度</label>
+            <div class="col-md-2">
               <%= f.select :difficulty, 
                           options_for_select([
                             ['すべての難易度', ''],
@@ -69,32 +74,30 @@
                             ['中級者', '中級者'],
                             ['上級者', '上級者']
                           ], params[:difficulty]),
-                          {}, { class: "form-select form-select-sm", id: "difficulty" } %>
+                          {}, { class: "form-select" } %>
             </div>
-            <div class="col-md-2 col-lg-2">
-              <label for="sort" class="form-label small text-muted mb-1">並び順</label>
+            <div class="col-md-2">
               <%= f.select :sort, 
                           options_for_select([
                             ['名前順', 'name'],
                             ['標高順', 'elevation'],
                             ['人気順', 'popular']
                           ], params[:sort]),
-                          {}, { class: "form-select form-select-sm", id: "sort" } %>
+                          {}, { class: "form-select" } %>
             </div>
-            <div class="col-md-3 col-lg-2">
-              <label for="elevation_range" class="form-label small text-muted mb-1">標高範囲</label>
-              <div class="input-group input-group-sm">
-                <%= f.number_field :elevation_min, placeholder: "最低", 
+            <div class="col-md-2">
+              <div class="input-group">
+                <%= f.number_field :elevation_min, placeholder: "最低標高", 
                                   value: params[:elevation_min], 
-                                  class: "form-control", id: "elevation_min" %>
+                                  class: "form-control" %>
                 <span class="input-group-text">-</span>
-                <%= f.number_field :elevation_max, placeholder: "最高", 
+                <%= f.number_field :elevation_max, placeholder: "最高標高", 
                                   value: params[:elevation_max], 
-                                  class: "form-control", id: "elevation_max" %>
+                                  class: "form-control" %>
               </div>
             </div>
-            <div class="col-md-auto col-lg-1">
-              <%= f.submit "検索", class: "btn btn-success w-100 btn-sm shadow-sm" %>
+            <div class="col-md-1">
+              <%= f.submit "検索", class: "btn btn-success w-100" %>
             </div>
           <% end %>
         </div>
@@ -102,71 +105,69 @@
     </div>
   </div>
 
-  <ul class="nav nav-tabs nav-pills mb-4 justify-content-center fade-in-up" style="animation-delay: 0.6s;" id="viewTabs" role="tablist">
+  <!-- 表示切替タブ -->
+  <ul class="nav nav-pills mb-4" id="viewTabs" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="grid-tab" data-bs-toggle="tab" data-bs-target="#grid-view" type="button" role="tab" aria-controls="grid-view" aria-selected="true">
+      <button class="nav-link active" id="grid-tab" data-bs-toggle="tab" data-bs-target="#grid-view" type="button" role="tab">
         <i class="bi bi-grid me-2"></i>グリッド表示
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-view" type="button" role="tab" aria-controls="map-view" aria-selected="false">
+      <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map-view" type="button" role="tab">
         <i class="bi bi-map me-2"></i>地図表示
       </button>
     </li>
   </ul>
 
+  <!-- タブコンテンツ -->
   <div class="tab-content" id="viewTabsContent">
+    <!-- グリッド表示 -->
     <div class="tab-pane fade show active" id="grid-view" role="tabpanel">
       <div class="row">
         <% if @mountains.any? %>
           <% @mountains.each do |mountain| %>
             <div class="col-6 col-md-4 col-lg-3 mb-4">
-              <%= link_to mountain_path(mountain), class: "text-decoration-none" do %>
-                <div class="card border-0 shadow-sm hover-card h-100">
-                  <div class="position-relative">
-                    <% if mountain.image_url.present? %>
-                      <%= image_tag mountain.image_url, 
-                                  class: "card-img-top", 
-                                  style: "height: 200px; object-fit: cover;" %>
-                    <% else %>
-                      <div class="bg-light d-flex align-items-center justify-content-center" 
-                           style="height: 200px; width: 100%;">
-                        <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
-                      </div>
-                    <% end %>
-                    
-                    <% if mountain.region.present? %>
-                      <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm">
-                        <%= mountain.region %>
-                      </span>
-                    <% end %>
-                    
-                    <% if mountain.elevation.present? %>
-                      <span class="badge bg-success position-absolute top-0 start-0 m-2 shadow-sm">
-                        <%= mountain.elevation %>m
-                      </span>
-                    <% end %>
-                  </div>
+              <div class="card border-0 shadow-sm hover-card h-100">
+                <div class="position-relative">
+                  <%= image_tag mountain.image_url.url.presence || "/placeholder.svg?height=200&width=300&text=#{mountain.name}", 
+                              class: "card-img-top", 
+                              style: "height: 200px; object-fit: cover;" %>
                   
-                  <div class="card-body">
-                    <h5 class="card-title mb-1 text-dark fw-bold">
-                      <%= mountain.name %>
-                    </h5>
-                    
-                    <p class="card-text small text-muted mb-3">
-                      <%= truncate(mountain.description, length: 80) %>
-                    </p>
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                      <small class="text-muted">
-                        <i class="bi bi-flower1 me-1"></i>
-                        <%= mountain.flowers.count %>種の花
-                      </small>
-                      <%# 詳細ボタンはカード全体がリンクになっているため不要、削除 %>
-                    </div>
+                  <!-- 地域バッジ -->
+                  <% if mountain.region.present? %>
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-2">
+                      <%= mountain.region %>
+                    </span>
+                  <% end %>
+                  
+                  <!-- 標高バッジ -->
+                  <% if mountain.elevation.present? %>
+                    <span class="badge bg-success position-absolute top-0 start-0 m-2">
+                      <%= mountain.elevation %>m
+                    </span>
+                  <% end %>
+                </div>
+                
+                <div class="card-body">
+                  <h5 class="card-title mb-2">
+                    <%= link_to mountain.name, mountain_path(mountain), 
+                              class: "text-decoration-none text-dark" %>
+                  </h5>
+                  
+                  <p class="card-text small text-muted mb-3">
+                    <%= truncate(mountain.description, length: 80) %>
+                  </p>
+                  
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <i class="bi bi-flower1"></i>
+                      <%= mountain.flowers.count %>種の花
+                    </small>
+                    <%= link_to "詳細", mountain_path(mountain), 
+                              class: "btn btn-outline-success btn-sm" %>
                   </div>
                 </div>
-              <% end %>
+              </div>
             </div>
           <% end %>
         <% else %>
@@ -177,14 +178,15 @@
               <p class="text-muted mb-4">
                 検索条件を変更して再度お試しください
               </p>
-              <%= link_to "すべての山を見る", mountains_path, class: "btn btn-success shadow-sm" %>
+              <%= link_to "すべての山を見る", mountains_path, class: "btn btn-success" %>
             </div>
           </div>
         <% end %>
       </div>
 
+      <!-- ページネーション -->
       <% if @mountains.respond_to?(:current_page) %>
-        <div class="row mt-4">
+        <div class="row">
           <div class="col-12">
             <div class="d-flex justify-content-center">
               <%= paginate @mountains %>
@@ -194,8 +196,9 @@
       <% end %>
     </div>
 
+    <!-- 地図表示 -->
     <div class="tab-pane fade" id="map-view" role="tabpanel">
-      <div class="card border-0 shadow-lg">
+      <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
           <div id="map" style="height: 600px; width: 100%;"></div>
         </div>
@@ -203,3 +206,14 @@
     </div>
   </div>
 </div>
+
+  <!-- 管理者用ボタン 現状はなしのち追加：? && current_user.admin?
+  <%# if defined?(user_signed_in?) && user_signed_in? %>
+    <div class="position-fixed bottom-0 end-0 m-4">
+      <%#= link_to new_mountain_path, class: "btn btn-success rounded-circle shadow-lg", 
+                style: "width: 60px; height: 60px;", 
+                data: { bs_toggle: "tooltip", bs_title: "新しい山を追加" } do %>
+        <i class="bi bi-plus-lg"></i>
+      <%# end %>
+    </div>
+  <%# end %>-->

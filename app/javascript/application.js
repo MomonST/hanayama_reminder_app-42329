@@ -18,7 +18,7 @@ document.addEventListener('turbo:load', () => {
 function initializeApp() {
   initNotificationPopup()
   initImagePreview()
-  //initLikeButtons()
+  initLikeButtons()
   initFavoriteButtons()
   initFormValidation()
   initTooltips()

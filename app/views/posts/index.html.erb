@@ -1,48 +1,46 @@
 <div class="container py-4">
-  <nav aria-label="breadcrumb" class="mb-4 fade-in-up">
+  <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><%= link_to "ホーム", root_path %></li>
       <li class="breadcrumb-item active" aria-current="page">投稿写真</li>
     </ol>
   </nav>
   
-  <div class="row mb-5 fade-in-up" style="animation-delay: 0.2s;">
+  <div class="row mb-4">
     <div class="col-md-8">
-      <h1 class="display-5 text-gradient fw-bold mb-2">
-        <i class="bi bi-camera me-2"></i>投稿写真ランキング
+      <h1 class="h3">
+        <i class="fas fa-camera text-pink me-2"></i>
+        投稿写真ランキング
       </h1>
-      <p class="lead text-muted">ユーザーがリアルタイムで投稿した花の写真をチェックしよう</p>
+      <p class="text-muted">ユーザーがリアルタイムで投稿した花の写真をチェックしよう</p>
     </div>
-    <div class="col-md-4 text-md-end d-flex align-items-center justify-content-md-end">
+    <div class="col-md-4 text-md-right">
       <% if user_signed_in? %>
-        <%= link_to new_post_path, class: "btn btn-pink btn-lg shadow-sm" do %>
-          <i class="bi bi-plus-circle me-2"></i>写真を投稿
+        <%= link_to new_post_path, class: "btn btn-pink" do %>
+          <i class="fas fa-camera me-1"></i>写真を投稿
         <% end %>
       <% end %>
     </div>
   </div>
   
-  <div class="card border-0 shadow-lg mb-5 fade-in-up" style="animation-delay: 0.4s;">
-    <div class="card-body py-4">
-      <%= form_with url: posts_path, method: :get, local: true, class: "row g-3 align-items-end" do |f| %>
-        <div class="col-md-4 col-lg-3">
-          <label for="post_search" class="form-label small text-muted mb-1">キーワード</label>
-          <%= f.text_field :search, placeholder: "キーワード検索", value: params[:search], class: "form-control form-control-sm", id: "post_search" %>
+  <!-- 検索・フィルター -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <%= form_with url: posts_path, method: :get, local: true, class: "row g-3" do |f| %>
+        <div class="col-md-3">
+          <%= f.text_field :search, placeholder: "キーワード検索", value: params[:search], class: "form-control" %>
         </div>
-        <div class="col-md-4 col-lg-3">
-          <label for="flower_select" class="form-label small text-muted mb-1">花で絞り込む</label>
+        <div class="col-md-3">
           <%= f.collection_select :flower_id, Flower.order(:name), :id, :name, 
                                  { prompt: "花を選択", selected: params[:flower_id] }, 
-                                 { class: "form-select form-select-sm", id: "flower_select" } %>
+                                 { class: "custom-select" } %>
         </div>
-        <div class="col-md-4 col-lg-3">
-          <label for="mountain_select" class="form-label small text-muted mb-1">山で絞り込む</label>
+        <div class="col-md-3">
           <%= f.collection_select :mountain_id, Mountain.order(:name), :id, :name, 
                                  { prompt: "山を選択", selected: params[:mountain_id] }, 
-                                 { class: "form-select form-select-sm", id: "mountain_select" } %>
+                                 { class: "custom-select" } %>
         </div>
-        <div class="col-md-4 col-lg-2">
-          <label for="sort_order" class="form-label small text-muted mb-1">並び順</label>
+        <div class="col-md-3">
           <%= f.select :sort, 
                       options_for_select([
                         ['新着順', 'recent'],
@@ -50,16 +48,17 @@
                         ['人気順', 'popular']
                       ], params[:sort]), 
                       { prompt: "並び順" }, 
-                      { class: "form-select form-select-sm", id: "sort_order" } %>
+                      { class: "custom-select" } %>
         </div>
-        <div class="col-md-auto col-lg-1 d-flex">
-          <%= f.submit "検索", class: "btn btn-success btn-sm w-100 me-2 shadow-sm" %>
-          <%= link_to "リセット", posts_path, class: "btn btn-outline-secondary btn-sm w-100 shadow-sm" %>
+        <div class="col-12">
+          <%= f.submit "検索", class: "btn btn-success me-2" %>
+          <%= link_to "リセット", posts_path, class: "btn btn-outline-secondary" %>
         </div>
       <% end %>
     </div>
   </div>
   
+  <!-- 投稿一覧 -->
   <% if @posts.any? %>
     <div class="row">
       <% @posts.each do |post| %>
@@ -67,70 +66,67 @@
           <div class="card border-0 shadow-sm hover-card h-100">
             <div class="position-relative">
               <%= link_to post_path(post) do %>
-                <% if post.image_url.present? %>
-                  <%= image_tag post.image_url.url, 
-                              class: "card-img-top", 
-                              style: "height: 250px; object-fit: cover;" %>
-                <% else %>
-                  <div class="bg-light d-flex align-items-center justify-content-center" 
-                       style="height: 250px; width: 100%;">
-                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                  </div>
-                <% end %>
+                <%= image_tag post.image_url.url.presence || "/placeholder.svg?height=250&width=400", 
+                            class: "card-img-top", 
+                            style: "height: 250px; object-fit: cover;" %>
               <% end %>
               
+              <!-- いいねボタン -->
               <div class="position-absolute top-0 end-0 m-2">
                 <% if user_signed_in? %>
                   <%= link_to like_post_path(post),
-                              class: "like-button btn btn-sm rounded-pill px-3 shadow-sm #{current_user.likes.exists?(post: post) ? 'btn-pink' : 'btn-outline-light text-dark'}",
-                              data: { turbo_method: :post } do  %>
-                    <i class="bi bi-heart-fill me-1"></i>
-                    <span class="like-count fw-bold"><%= post.likes_count %></span>
+                              class: "like-button btn btn-sm #{current_user.likes.exists?(post: post) ? 'btn-danger' : 'btn-outline-light'}",
+                              data: {
+                                turbo_method: :post # initLikeButtons で使用される method 属性
+                              } do  %>
+                    <i class="fas fa-heart <%= current_user.likes.exists?(post: post) ? 'text-white' : 'text-danger' %>"></i>
+                    <span class="like-count"><%= post.likes_count %></span>
                   <% end %>
                 <% else %>
-                  <button class="btn btn-sm btn-outline-light rounded-pill px-3 shadow-sm" disabled>
-                    <i class="bi bi-heart-fill me-1 text-danger"></i>
-                    <span class="fw-bold"><%= post.likes_count %></span>
+                  <button class="btn btn-sm btn-outline-light" disabled>
+                    <i class="far fa-heart"></i>
+                    <%= post.likes_count %>
                   </button>
                 <% end %>
               </div>
               
+              <!-- 花・山バッジ -->
               <div class="position-absolute bottom-0 start-0 m-2">
                 <% if post.flower_mountain&.flower %>
-                  <span class="badge bg-pink me-1 shadow-sm">
-                    <i class="bi bi-flower1 me-1"></i><%= post.flower_mountain.flower.name %>
+                  <span class="badge bg-pink me-1">
+                    <i class="fas fa-seedling me-1"></i><%= post.flower_mountain.flower.name %>
                   </span>
                 <% end %>
                 <% if post.flower_mountain&.mountain %>
-                  <span class="badge bg-success shadow-sm">
-                    <i class="bi bi-mountains me-1"></i><%= post.flower_mountain.mountain.name %>
+                  <span class="badge bg-success">
+                    <i class="fas fa-mountain me-1"></i><%= post.flower_mountain.mountain.name %>
                   </span>
                 <% end %>
               </div>
             </div>
             
             <div class="card-body">
-              <p class="card-text mb-3 small text-muted">
+              <p class="card-text mb-3">
                 <%= truncate(post.content, length: 80) %>
               </p>
               
               <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
-                    <i class="bi bi-person-circle text-secondary" style="font-size: 1.5rem;"></i>
+                  <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <i class="fas fa-user text-secondary"></i>
                   </div>
                   <div>
-                    <small class="text-muted fw-bold">
-                      <%= link_to post.user.nickname, user_path(post.user), class: "text-decoration-none text-dark" %>
+                    <small class="text-muted">
+                      <%= link_to post.user.nickname, user_path(post.user), class: "text-decoration-none" %>
                     </small>
                     <br>
-                    <small class="text-muted small">
+                    <small class="text-muted">
                       <%= time_ago_in_words(post.created_at) %>前
                     </small>
                   </div>
                 </div>
                 
-                <%= link_to "詳細を見る", post_path(post), class: "btn btn-outline-primary btn-sm shadow-sm" %>
+                <%= link_to "詳細", post_path(post), class: "btn btn-outline-primary btn-sm" %>
               </div>
             </div>
           </div>
@@ -138,18 +134,19 @@
       <% end %>
     </div>
     
-    <div class="d-flex justify-content-center mt-4">
+    <!-- ページネーション -->
+    <div class="d-flex justify-content-center">
       <%= paginate @posts %>
     </div>
   <% else %>
     <div class="text-center py-5">
-      <i class="bi bi-camera text-muted mb-3" style="font-size: 4rem;"></i>
+      <i class="fas fa-camera text-muted" style="font-size: 4rem;"></i>
       <h4 class="text-muted mt-3">投稿がありません</h4>
       <p class="text-muted">まだ投稿された写真がありません。最初の投稿をしてみませんか？</p>
       <% if user_signed_in? %>
-        <%= link_to "写真を投稿する", new_post_path, class: "btn btn-pink shadow-sm" %>
+        <%= link_to "写真を投稿する", new_post_path, class: "btn btn-pink" %>
       <% else %>
-        <%= link_to "ログインして投稿する", new_user_session_path, class: "btn btn-success shadow-sm" %>
+        <%= link_to "ログインして投稿する", new_user_session_path, class: "btn btn-success" %>
       <% end %>
     </div>
   <% end %>
