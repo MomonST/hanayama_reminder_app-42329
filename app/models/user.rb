@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :posts, dependent: :destroy
   has_many :likes, dependent: :destroy
+  has_many :liked_posts, through: :likes, source: :post
   
   # お気に入りの花山関連付け（中間テーブル経由）
   has_many :favorite_flower_mountains, through: :favorites, source: :flower_mountain

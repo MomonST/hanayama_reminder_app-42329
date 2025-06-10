@@ -129,8 +129,8 @@
                   <% end %>
                   
                   <!-- 難易度バッジ -->
-                  <span class="badge bg-<%= mountain.difficulty_level == '初心者' ? 'success' : mountain.difficulty_level == '中級者' ? 'warning' : 'danger' %> position-absolute top-0 start-0 m-2">
-                    <%= mountain.difficulty_level %>
+                  <span class="badge bg-<%= @mountain.difficulty_level == '初心者' ? 'success' : @mountain.difficulty_level == '中級者' ? 'warning' : 'danger' %> position-absolute top-0 start-0 m-2">
+                    <%= @mountain.difficulty_level %>
                   </span>
                 </div>
                 
@@ -146,9 +146,9 @@
                     </p>
                   <% end %>
                   
-                  <% if flower_mountain.peak_period.present? %>
+                  <% if flower_mountain.peak_month.present? %>
                     <p class="mb-3">
-                      <strong>見頃:</strong> <%= flower_mountain.peak_period %>
+                      <strong>見頃:</strong> <%= flower_mountain.peak_month %>
                     </p>
                   <% end %>
                   
@@ -263,7 +263,7 @@
           <% @recent_posts.each do |post| %>
             <div class="col-6 col-md-4 col-lg-3 mb-4">
               <div class="card border-0 shadow-sm hover-card">
-                <%= image_tag post.image_url.presence || "/placeholder.svg?height=200&width=200", 
+                <%= image_tag post.image_url.url.presence || "/placeholder.svg?height=200&width=200", 
                             class: "card-img-top", 
                             style: "height: 200px; object-fit: cover;" %>
                 <div class="card-body p-3">

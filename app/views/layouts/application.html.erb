@@ -19,14 +19,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     
     <!-- Stylesheets -->
-    <%= stylesheet_link_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     
     <!-- JavaScript -->
     <%= javascript_importmap_tags %>
-
+    
     <!-- Google Maps API -->
     <% if content_for?(:use_google_maps) %>
-      <script>window.mapData = <%= raw @map_data.to_json if defined?(@map_data) && @map_data.present? %>;</script>
+      <script>
+        // @map_data が定義されていて、かつ空でない場合のみ window.mapData を設定する
+        <% if defined?(@map_data) && @map_data.present? %>
+          window.mapData = <%= raw @map_data.to_json %>;
+        <% else %>
+          window.mapData = []; // データがない場合は空の配列を設定する
+        <% end %>
+      </script>
       <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer>
       </script>
     <% end %>
@@ -76,15 +83,174 @@
     </button>
     
     <script>
+      // グローバル変数 HanayamaReminder の初期化は一度だけ
+      window.HanayamaReminder = window.HanayamaReminder || { map: null, markers: [] };
+
       // ページトップボタンの表示制御
       window.addEventListener('scroll', function() {
         const pageTop = document.getElementById('page-top');
-        if (window.scrollY > 300) {
-          pageTop.classList.remove('d-none');
-        } else {
-          pageTop.classList.add('d-none');
+        if (pageTop) { 
+          if (window.scrollY > 300) {
+            pageTop.classList.remove('d-none');
+          } else {
+            pageTop.classList.add('d-none');
+          }
         }
       });
+
+      // showAlert, createAlertContainer は application.js から移動せず、application.jsが読み込まれることで利用可能にする
+      // copyShareUrl は app/views/posts/show.html.erb などに定義されているはずなので、ここでは定義しない
+      // あるいは、application.jsからexportして利用する
+      // グローバルにアクセス可能なinitMap関数 (Google Maps APIのコールバックとして使用)
+      // HanayamaReminder.map が必要であれば、initMapの外で定義しておく
+      
+      // InfoWindow のコンテンツ作成 (initMapとaddMarkersToMapの前に定義が必要)
+      function createInfoWindowContent(location) {
+        return `
+          <div style="padding: 10px; max-width: 250px; font-family: 'Helvetica Neue', Arial, sans-serif;">
+            <h5 style="margin: 0 0 8px 0; color: #1f2937; font-weight: 600;">${location.name}</h5>
+            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
+              <strong>🌸 花:</strong> ${location.flower}
+            </p>
+            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
+              <strong>📍 難易度:</strong> ${location.difficulty || '未設定'}
+            </p>
+            ${location.days_left ? `
+              <p style="margin: 4px 0; color: #22c55e; font-size: 14px; font-weight: 600;">
+                <strong>⏰ 見頃まで:</strong> あと${location.days_left}日
+              </p>
+            ` : ''}
+            <div style="margin-top: 12px;">
+              <a href="/flower_mountains/${location.id}" 
+                 style="background: linear-gradient(135deg, #22c55e, #16a34a); 
+                        color: white; 
+                        padding: 6px 12px; 
+                        border-radius: 6px; 
+                        text-decoration: none; 
+                        font-size: 13px; 
+                        font-weight: 500;">
+                詳細を見る
+              </a>
+            </div>
+          </div>
+        `;
+      }
+
+      // マーカーを地図に追加 (initMapの前に定義が必要)
+      function addMarkersToMap(locations) {
+        // 既存のマーカーをマップから削除し、配列をクリア
+        if (window.HanayamaReminder.markers) { // 存在チェック
+          window.HanayamaReminder.markers.forEach(m => m.marker.setMap(null)); // 修正: m.marker にアクセス
+        }
+        window.HanayamaReminder.markers = []; // 新しい配列で初期化
+        
+        const bounds = new google.maps.LatLngBounds();
+        
+        locations.forEach(location => {
+          if (location.lat && location.lng) {
+            const marker = new google.maps.Marker({
+              position: { lat: parseFloat(location.lat), lng: parseFloat(location.lng) },
+              map: HanayamaReminder.map,
+              title: location.name,
+              icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                  <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="12" fill="#22c55e" stroke="#fff" stroke-width="2"/>
+                    <text x="16" y="20" text-anchor="middle" fill="white" font-size="16">🌸</text>
+                  </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+              }
+            });
+            
+            const infoWindow = new google.maps.InfoWindow({
+              content: createInfoWindowContent(location)
+            });
+            
+            marker.addListener('click', () => {
+              // 他のInfoWindowを閉じる
+              HanayamaReminder.markers.forEach(m => {
+                if (m.infoWindow) m.infoWindow.close();
+              });
+              
+              infoWindow.open(HanayamaReminder.map, marker);
+            });
+            // HanayamaReminder.markers にマーカーとInfoWindowをセットで保存
+            HanayamaReminder.markers.push({ marker: marker, infoWindow: infoWindow });
+            bounds.extend(marker.getPosition());
+          }
+        });
+        
+        if (HanayamaReminder.markers.length > 0) {
+          HanayamaReminder.map.fitBounds(bounds);
+          google.maps.event.addListenerOnce(HanayamaReminder.map, 'bounds_changed', () => {
+            if (HanayamaReminder.map.getZoom() > 12) {
+              HanayamaReminder.map.setZoom(12);
+            }
+          });
+        }
+      }
+
+      // 地図初期化（Google Maps APIのコールバックとして呼び出される）
+      window.initMap = function() {
+        const mapElement = document.getElementById('map');
+        if (!mapElement) {
+          // map要素が存在しない場合は何もしない（例：地図のないページ）
+          // 既存のマップインスタンスが存在する場合、それを破棄するロジックが必要であればここに追加
+          if (window.HanayamaReminder && window.HanayamaReminder.map) {
+            // HanayamaReminder.map.setMap(null); // 地図要素がなくなったらマップを破棄
+            // HanayamaReminder.map = null;
+          }
+          return;
+        }
+
+        // 既存のマップインスタンスが存在し、かつ新しいマップ要素に紐付いていない場合は破棄
+        if (window.HanayamaReminder && window.HanayamaReminder.map && 
+          window.HanayamaReminder.map.getDiv() !== mapElement) {
+          // 既存のマップが別のDOM要素に紐づいている場合、新しいマップを作成するために古いマップを破棄
+          // Google Maps APIでは直接mapを破棄するメソッドはないため、参照をnullにする
+          // (メモリリークの可能性はありますが、一般的にはGCが処理します)
+          window.HanayamaReminder.map = null; 
+        }
+
+        // mapがまだ初期化されていないか、または新しいmap要素に初期化する必要がある場合
+        if (!window.HanayamaReminder.map || window.HanayamaReminder.map.getDiv() !== mapElement) {
+          const center = { lat: 36.2048, lng: 138.2529 }; window.HanayamaReminder.map = new google.maps.Map(mapElement, {
+            zoom: 6,
+            center: center,
+            styles: [
+              {
+                featureType: 'all',
+                elementType: 'geometry.fill',
+                stylers: [{ color: '#f0f9ff' }]
+              },
+              {
+                featureType: 'water',
+                elementType: 'geometry',
+                stylers: [{ color: '#a7c6ed' }]
+              }
+            ]
+          });
+        }
+        
+        // マーカーの追加は、マップが初期化された後に行う
+        // HanayamaReminder.markers をクリアしてから追加
+        if (window.HanayamaReminder.map && window.mapData && window.mapData.length > 0) {
+          addMarkersToMap(window.mapData);
+        }
+      }; 
+      // TurboDriveのページ読み込み完了イベントでinitMapを呼び出す
+      document.addEventListener('turbo:load', function() {
+        // initMapがGoogle Maps APIのcallbackで呼び出されるより後に実行される可能性があるため、
+        // ある程度の遅延を持たせるか、initMap内で複数回の初期化を安全に処理するロジックを実装する
+        // ここでは、Google Maps APIが確実に読み込まれていることを前提とする
+        if (typeof google === 'object' && typeof google.maps === 'object') {
+          initMap();
+        }
+      });
+
+      // Turbo Driveがページを「復元」する際に、イベントリスナーが二重に登録されるのを防ぐ
+      // (initMap内のイベントリスナーは、addMarkersToMap内でmarkers配列をクリアしているので問題ないはず)
     </script>
   </body>
 </html>

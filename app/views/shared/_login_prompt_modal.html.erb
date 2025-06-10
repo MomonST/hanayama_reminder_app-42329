@@ -1,0 +1,21 @@
+<div class="modal fade" id="loginPromptModal" tabindex="-1" aria-labelledby="loginPromptModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header d-block text-center border-0 pb-0">
+        <h5 class="modal-title fs-4 text-center" id="loginPromptModalLabel">ログインが必要です</h5>
+      </div>
+      <div class="modal-body text-center pt-0">
+        <p class="text-secondary mb-4">
+          この機能をご利用いただくには、ログインまたは新規登録が必要です。
+        </p>
+        <div class="d-flex gap-2 mb-3">
+          <%= link_to "ログイン", new_user_session_path, class: "btn btn-success flex-grow-1", id: "modalLoginButton" %>
+          <%= link_to "新規登録", new_user_registration_path, class: "btn btn-outline-secondary flex-grow-1", id: "modalSignUpButton" %>
+        </div>
+        <button type="button" class="btn btn-link text-secondary w-100" data-bs-dismiss="modal">
+          キャンセル
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

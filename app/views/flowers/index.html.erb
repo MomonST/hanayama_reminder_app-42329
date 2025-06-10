@@ -103,7 +103,7 @@
         <div class="col-6 col-md-4 col-lg-3 mb-4">
           <div class="card border-0 shadow-sm hover-card h-100">
             <div class="position-relative">
-              <%= image_tag flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{flower.name}", 
+              <%= image_tag flower.image_url.url.presence || "/placeholder.svg?height=200&width=300&text=#{flower.name}", 
                            class: "card-img-top", 
                            style: "height: 200px; object-fit: cover;" %>
               
@@ -174,14 +174,14 @@
     </div>
   <% end %>
 
-  <!-- 管理者用ボタン -->
-  <% if user_signed_in? && current_user.admin? %>
+  <!-- (追加実装の場合)管理者用ボタン && current_user.admin? 
+  <%# if user_signed_in? %> 
     <div class="position-fixed bottom-0 end-0 m-4">
-      <%= link_to new_flower_path, class: "btn btn-success rounded-circle shadow-lg", 
+      <%# = link_to new_flower_path, class: "btn btn-success rounded-circle shadow-lg", 
                  style: "width: 60px; height: 60px;", 
                  data: { bs_toggle: "tooltip", bs_title: "新しい花を追加" } do %>
         <i class="bi bi-plus-lg"></i>
-      <% end %>
+      <%# end %>
     </div>
-  <% end %>
-</div>
+  <%# end %>
+</div> -->

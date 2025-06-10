@@ -28,13 +28,21 @@
       <div class="col-md-2 mb-4">
         <h6 class="text-uppercase fw-bold mb-3">機能</h6>
         <ul class="list-unstyled">
-          <li class="mb-2">
-            <%= link_to "花登山マップ", flower_mountains_path, class: "text-light text-decoration-none" %>
-          </li>
-          <li class="mb-2">
-            <%= link_to "写真ランキング", posts_path, class: "text-light text-decoration-none" %>
-          </li>
           <% if user_signed_in? %>
+            <li class="mb-2">
+              <%= link_to "花登山マップ", flower_mountains_path, class: "text-light text-decoration-none" %>
+            </li>
+            <%# 花図鑑へのリンクを追加 %>
+            <li class="mb-2">
+              <%= link_to "花図鑑", flowers_path, class: "text-light text-decoration-none" %>
+            </li>
+            <%# 山一覧へのリンクを追加 %>
+            <li class="mb-2">
+              <%= link_to "山一覧", mountains_path, class: "text-light text-decoration-none" %>
+            </li>
+            <li class="mb-2">
+              <%= link_to "写真ランキング", posts_path, class: "text-light text-decoration-none" %>
+            </li>
             <li class="mb-2">
               <%= link_to "お気に入り", favorites_path, class: "text-light text-decoration-none" %>
             </li>

@@ -46,10 +46,17 @@
                 </small>
                 <div>
                   <%= link_to "詳細", flower_path(favorite.flower), class: "btn btn-outline-success btn-sm me-1" %>
-                  <%= link_to favorite_path(favorite), method: :delete, 
-                              data: { confirm: "お気に入りから削除しますか？" }, 
-                              class: "btn btn-outline-danger btn-sm" do %>
-                    <i class="bi bi-heart-fill"></i>
+                  
+                  <%# お気に入り解除ボタンをAjaxでtoggleアクションを呼び出すように修正 %>
+                  <%# favorite.flower_mountain に確実にアクセスできるようにする %>
+                  <% @flower_mountain = favorite.flower_mountain %>
+                  <%= link_to toggle_favorites_path(flower_mountain_id: flower_mountain.id),
+                              class: "favorite-button btn btn-outline-danger btn-sm",
+                              data: {
+                                # data-confirm は不要（JS側でshowAlertを表示するため）
+                                # method: :delete も不要（JSでPOSTを送信するため）
+                              } do %>
+                    <i class="bi bi-star-fill"></i> <%# お気に入り済みなので塗りつぶしアイコン %>
                   <% end %>
                 </div>
               </div>

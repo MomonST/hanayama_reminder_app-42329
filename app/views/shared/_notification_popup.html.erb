@@ -22,3 +22,75 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('turbo:load', () => {
+    const notificationPopup = document.querySelector('.notification-popup');
+    const closeButton = notificationPopup.querySelector('.btn-close');
+    const laterButton = notificationPopup.querySelector('.btn-outline-secondary');
+    const registerButton = notificationPopup.querySelector('.btn-pink'); // 今すぐ登録ボタン
+
+    // Cookieからポップアップの表示状態をチェック
+    function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
+
+    // Cookieにポップアップの表示状態を保存
+    function setCookie(name, value, days) {
+      let expires = "";
+      if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+
+    // ポップアップを表示する関数
+    function showPopup() {
+      notificationPopup.style.display = 'block';
+      notificationPopup.classList.add('fade-in-up'); // アニメーションクラスを追加
+    }
+
+    // ポップアップを非表示にする関数
+    function hidePopup() {
+      notificationPopup.style.display = 'none';
+      notificationPopup.classList.remove('fade-in-up');
+    }
+
+    // 初回ロード時にポップアップを表示
+    if (getCookie('notification_popup_shown') !== 'true') {
+      showPopup();
+      setCookie('notification_popup_shown', 'true', 30); // 30日間表示しない
+    } else {
+      hidePopup(); // Cookieがある場合は非表示
+    }
+
+    // 閉じるボタンのイベントリスナー
+    closeButton.addEventListener('click', () => {
+      hidePopup();
+      // 必要であればCookieで閉じた状態を保存
+      // setCookie('notification_popup_closed', 'true', 30);
+    });
+
+    // 後でボタンのイベントリスナー
+    laterButton.addEventListener('click', () => {
+      hidePopup();
+      // 必要であればCookieで閉じた状態を保存
+      // setCookie('notification_popup_closed', 'true', 30);
+    });
+
+    // 今すぐ登録ボタンがクリックされた時の処理
+    registerButton.addEventListener('click', () => {
+      // ユーザーが登録ページに移動するので、ポップアップは非表示にする
+      hidePopup();
+    });
+  });
+</script>

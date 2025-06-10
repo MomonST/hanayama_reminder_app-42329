@@ -38,7 +38,7 @@ class PostsController < ApplicationController
     @post = current_user.posts.build(post_params)
     
     if @post.save
-      redirect_to @post, notice: "投稿が完了しました"
+      redirect_to @post, notice: "投稿が作成されました"
     else
       @flower_mountains = FlowerMountain.includes(:flower, :mountain).all
       render :new
@@ -60,7 +60,7 @@ class PostsController < ApplicationController
   
   def destroy
     @post.destroy
-    redirect_to posts_path, notice: "投稿を削除しました"
+    redirect_to posts_path, notice: "投稿が削除されました"
   end
   
   private
