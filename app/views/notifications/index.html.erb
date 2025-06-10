@@ -5,13 +5,19 @@
         <h1 class="h3 text-gradient mb-0">
           <i class="bi bi-bell me-2"></i>通知一覧
         </h1>
+
+        <div class="d-flex align-items-center"> <%# このdivを追加してボタンをまとめる %>
+          <%= link_to new_notification_path, class: "btn btn-outline-info btn-sm me-2" do %>
+            <i class="bi bi-gear me-1"></i>通知設定
+          <% end %>
         
-        <% if @notifications.any? %>
-          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#clearAllModal">
-            <i class="bi bi-trash me-1"></i>
-            すべて削除
-          </button>
-        <% end %>
+          <% if @notifications.any? %>
+            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#clearAllModal">
+              <i class="bi bi-trash me-1"></i>
+              すべて削除
+            </button>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
@@ -22,7 +28,7 @@
         <div class="card border-0 shadow-sm">
           <div class="list-group list-group-flush">
             <% @notifications.each do |notification| %>
-              <div class="list-group-item list-group-item-action p-3 <%= 'bg-light' unless notification.read %>">
+              <div class="list-group-item list-group-item-action p-3 <%= 'bg-light' unless notification.sent %>">
                 <div class="d-flex w-100 justify-content-between align-items-center">
                   <div class="d-flex align-items-center">
                     <div class="me-3">
@@ -62,7 +68,7 @@
         <!-- ページネーション -->
         <% if @notifications.respond_to?(:current_page) %>
           <div class="d-flex justify-content-center mt-4">
-            <%= paginate @notifications, theme: 'bootstrap_5' %>
+            <%= paginate @notifications %>
           </div>
         <% end %>
       <% else %>

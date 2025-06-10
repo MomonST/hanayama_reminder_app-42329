@@ -10,6 +10,7 @@ class Notification < ApplicationRecord
   validates :user_id, presence: true, uniqueness: { scope: :flower_mountain_id, message: "既にこの花山スポットの通知が設定されています" }
   validates :notification_date, presence: true
   validates :flower_mountain_id, presence: true
+  validates :notification_type, presence: true, inclusion: { in: %w(flower_blooming reminder like comment system) } 
 
   # 通知日の自動計算
   before_validation :calculate_notification_date
