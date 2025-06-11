@@ -155,20 +155,13 @@ function initLikeButtons() {
 
 // お気に入りボタンの処理
 function initFavoriteButtons() {
-  console.log("initFavoriteButtons が実行されました"); // ★追加
   const favoriteButtons = document.querySelectorAll(".favorite-button");
-  console.log("見つかったお気に入りボタンの数:", favoriteButtons.length); // ★追加
 
   favoriteButtons.forEach((button) => {
-    console.log("お気に入りボタンにイベントリスナーを追加中:", button); // ★追加
-
     button.addEventListener("click", function (e) {
-      console.log("お気に入りボタンがクリックされました！", this.href); // ★追加
       e.preventDefault();
-      console.log("e.preventDefault() が実行されました"); // ★追加
 
       if (this.dataset.processing === "true") {
-        console.log("処理中のためリクエストをスキップ"); // ★追加
         return;
       }
 
@@ -177,7 +170,6 @@ function initFavoriteButtons() {
       const countElement = this.querySelector(".favorite-count")
 
       // Ajax リクエスト
-      console.log("Ajaxリクエストを送信します..."); // ★追加
       fetch(this.href, {
         method: "POST",
         headers: {
@@ -188,7 +180,6 @@ function initFavoriteButtons() {
         credentials: "same-origin",
       })
         .then((response) => {
-          console.log("Ajaxレスポンスを受信しました:", response); // ★追加
           return response.json();
         })
         .then((data) => {
@@ -217,12 +208,10 @@ function initFavoriteButtons() {
           }
         })
         .catch((error) => {
-          console.error("Fetchエラー:", error); // ★追加
           showAlert("エラーが発生しました", "danger");
         })
         .finally(() => {
           this.dataset.processing = "false";
-          console.log("Ajax処理完了"); // ★追加
         });
     });
   });

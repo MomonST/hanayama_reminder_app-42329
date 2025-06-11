@@ -21,7 +21,7 @@
         <div class="col-md-4 col-lg-3 mb-4">
           <div class="card border-0 shadow-sm hover-card h-100">
             <div class="position-relative">
-              <%= image_tag favorite.flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{favorite.flower.name}", 
+              <%= image_tag favorite.flower.image_url.url.presence || "/placeholder.svg?height=200&width=300&text=#{favorite.flower.name}", 
                           class: "card-img-top", 
                           style: "height: 200px; object-fit: cover;" %>
               <% if favorite.flower.blooming_now? %>
@@ -47,10 +47,8 @@
                 <div>
                   <%= link_to "詳細", flower_path(favorite.flower), class: "btn btn-outline-success btn-sm me-1" %>
                   
-                  <%# お気に入り解除ボタンをAjaxでtoggleアクションを呼び出すように修正 %>
-                  <%# favorite.flower_mountain に確実にアクセスできるようにする %>
                   <% @flower_mountain = favorite.flower_mountain %>
-                  <%= link_to toggle_favorites_path(flower_mountain_id: flower_mountain.id),
+                  <%= link_to toggle_favorites_path(flower_mountain_id: @flower_mountain.id),
                               class: "favorite-button btn btn-outline-danger btn-sm",
                               data: {
                                 # data-confirm は不要（JS側でshowAlertを表示するため）

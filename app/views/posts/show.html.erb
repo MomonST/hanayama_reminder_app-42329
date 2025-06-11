@@ -81,7 +81,7 @@
             <div class="mb-3">
               <h6 class="mb-2"><i class="bi bi-flower1 text-pink me-2"></i>花</h6>
               <div class="d-flex align-items-center">
-                <%= image_tag @post.flower_mountain.flower.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower_mountain.flower.name}", 
+                <%= image_tag @post.flower_mountain.flower.image_url.url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower_mountain.flower.name}", 
                             class: "rounded me-2", 
                             style: "width: 50px; height: 50px; object-fit: cover;" %>
                 <div>
@@ -98,7 +98,7 @@
             <div>
               <h6 class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>山</h6>
               <div class="d-flex align-items-center">
-                <%= image_tag @post.flower_mountain.mountain.image_url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower_mountain.mountain.name}", 
+                <%= image_tag @post.flower_mountain.mountain.image_url.url.presence || "/placeholder.svg?height=50&width=50&text=#{@post.flower_mountain.mountain.name}", 
                             class: "rounded me-2", 
                             style: "width: 50px; height: 50px; object-fit: cover;" %>
                 <div>

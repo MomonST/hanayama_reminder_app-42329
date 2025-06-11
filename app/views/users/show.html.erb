@@ -171,8 +171,8 @@
                 <div class="col-md-6 col-lg-4 mb-4">
                   <div class="card border-0 shadow-sm hover-card h-100">
                     <div class="position-relative">
-                      <%= link_to mountain_flower_mountain_path(favorite.mountain, favorite.flower_mountain) do %>
-                        <%= image_tag favorite.flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{favorite.flower.name}", 
+                      <%= link_to flower_mountain_path(favorite.flower_mountain) do %>
+                        <%= image_tag favorite.flower.image_url.url.presence || "/placeholder.svg?height=200&width=300&text=#{favorite.flower.name}", 
                                     class: "card-img-top", 
                                     style: "height: 200px; object-fit: cover;" %>
                       <% end %>

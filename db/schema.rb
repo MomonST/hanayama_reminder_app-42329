@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_02_104818) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_10_091816) do
   create_table "favorites", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "flower_mountain_id", null: false
@@ -72,6 +72,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_02_104818) do
     t.boolean "sent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "notification_type", default: "reminder", null: false
+    t.string "url"
     t.index ["flower_mountain_id"], name: "index_notifications_on_flower_mountain_id"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end

@@ -34,14 +34,14 @@ Things you may want to cover:
 <br>ユーザーはエリアを登録しておけば、簡単に見頃の花の情報とそのお花が見れる登山スポットを事前に通してしてくれます。詳細画面では画像やマップ、開花予測などが閲覧できます。
 
 ## URL
-https://◎◎◎◎.onrender.com
+https://hanayama-reminder-app-42329.onrender.com
 <br>※デプロイ済みのURLを記載。デプロイが済んでいない場合は、デプロイが完了次第記載すること。
 
 ## テスト用アカウント
-テスト用Email：test@test.com
-<br>テスト用Password：aaa123
-<br>※ログイン機能等を実装した場合は、ログインに必要な情報を記載。
-<br>※またBasic認証等を設けている場合は、そのID/Passも記載すること。
+テスト用Email：usagi@mail
+<br>テスト用Password：usa111
+<br>ログイン：上記のメールアドレス・パスワードを入力
+<br>※Basic認証 ID:momonst /Pass: 0407
 
 ## 利用方法
 1. URLにアクセスし、ヘッダー右上の「ログイン」ボタンからログイン画面に移動します。
@@ -79,33 +79,35 @@ https://◎◎◎◎.onrender.com
   初心者向けの低山〜上級者向けの高山まで、花の種類や標高でルート検索OK
 
 ## データベース設計
-ER図を添付。
-<br>AIで作る場合は、googleアカウントがあれば使用できる「Vercel v0」がオススメです。
-<img width="307" alt="Image" src="https://github.com/user-attachments/assets/f780ed7f-e22c-495f-ad7d-5add7f75e45f" />
+
+<br>ER図
+<img width="307" alt="Image" src="" />
+[![Image from Gyazo](https://i.gyazo.com/b393a957421f429bb16acba643b3dc9a.png)](https://gyazo.com/b393a957421f429bb16acba643b3dc9a)
 
 
 ## 画面遷移図
-画面遷移図を添付。
-<br>AIで作る場合は、googleアカウントがあれば使用できる「Vercel v0」がオススメです。
-<img width="509" alt="Image" src="https://github.com/user-attachments/assets/086ceb82-5286-4340-b4ff-014d621e4d26" />
+
+<br>画面遷移図
+<img width="509" alt="Image" src="" />
+[![Image from Gyazo](https://i.gyazo.com/32802e39a816a4af00e7e9b98c8dea4c.png)](https://gyazo.com/32802e39a816a4af00e7e9b98c8dea4c)
 
 
 ## 開発環境
 | 項目               | バージョン・サービス |
-|------------------|-----------------|
-| **言語**        | Ruby 3.2.0 |
-| **フレームワーク** | Ruby on Rails 7.1.5.1 |
-| **データベース**  | PostgreSQL 14.15（本番） / MySQL 8.0（開発） |
-| **フロントエンド** | HTML / CSS / JavaScript |
-| **認証機能**    | Devise |
-| **デプロイ環境** | Render |
-| **バージョン管理** | GitHub |
+|-------------------|-------------------|
+| **言語**           | Ruby 3.2.0        |
+| **フレームワーク**    | Ruby on Rails 7.1.5.1 |
+| **データベース**     | PostgreSQL 14.15（本番） / MySQL 8.0（開発） |
+| **フロントエンド**     | HTML / SCSS / JavaScript |
+| **認証機能**        | Devise |
+| **デプロイ環境**     | Render |
+| **バージョン管理**    | GitHub |
 
 ## ローカルでの動作方法
 
 1. リポジトリをクローンします。
 ```ruby
-  git clone https://github.com/GitHubのユーザー名/アプリ名
+  git clone https://github.com/momonst/hanayama-reminder-app-42329.git
 ```
 
 2.必要なGemをインストールします。
@@ -140,7 +142,9 @@ ER図を添付。
 - 年によって開花時期が変わる（気候変動の影響）
 - 場所によって微妙に時期が違う（標高・向きなど）
 - リアルタイムの開花状況が最も価値があるのにAPI連携できる情報元は制限されている
-<br>管理者権限を作成する
+<br> -管理者権限を作成する
+<br> -天気情報と連携する
+<br> -カレンダーと連携する
 
 解決策として、、
 💡 ユーザー参加型データ収集の仕組みと価値
@@ -155,4 +159,4 @@ ER図を添付。
 <br>画像の複数アップロード：複数の画像を一度に投稿できる機能を追加します。
 
 ## 制作時間
-80時間
+190時間

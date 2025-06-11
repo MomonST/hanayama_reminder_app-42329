@@ -48,7 +48,7 @@
               <div class="d-flex mt-3">
                 <div class="me-3">
                   <% if notification.flower_mountain.flower.image_url.present? %>
-                    <%= image_tag notification.flower_mountain.flower.image_url, 
+                    <%= image_tag notification.flower_mountain.flower.image_url.url.presence || "/placeholder.svg",
                         class: "rounded", style: "width: 80px; height: 80px; object-fit: cover;" %>
                   <% else %>
                     <div class="bg-light rounded d-flex align-items-center justify-content-center" 
@@ -110,7 +110,7 @@
           <%= link_to flower_mountain_path(fm), class: "text-decoration-none" do %>
             <div class="card border-0 shadow-sm h-100 hover-card">
               <% if fm.mountain.image_url.present? %>
-                <%= image_tag fm.mountain.image_url, class: "card-img-top", style: "height: 160px; object-fit: cover;" %>
+                <%= image_tag fm.mountain.image_url.url.presence || "/placeholder.svg", class: "card-img-top", style: "height: 160px; object-fit: cover;" %>
               <% else %>
                 <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
                   <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
