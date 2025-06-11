@@ -8,7 +8,7 @@
       <div class="card border-0 shadow-lg overflow-hidden">
         <div class="row g-0">
           <div class="col-md-6">
-            <%= image_tag @mountain.image_url.presence || "/placeholder.svg?height=400&width=600&text=#{@mountain.name}", 
+            <%= image_tag @mountain.image_url.url.presence || "/placeholder.svg?height=400&width=600&text=#{@mountain.name}", 
                          class: "img-fluid w-100", 
                          style: "height: 400px; object-fit: cover;" %>
           </div>
@@ -117,7 +117,7 @@
             <div class="col-md-6 col-lg-4 mb-4">
               <div class="card border-0 shadow-sm hover-card h-100">
                 <div class="position-relative">
-                  <%= image_tag flower_mountain.flower.image_url.presence || "/placeholder.svg?height=200&width=300&text=#{flower_mountain.flower.name}", 
+                  <%= image_tag flower_mountain.flower.image_url.url.presence || "/placeholder.svg?height=200&width=300&text=#{flower_mountain.flower.name}", 
                               class: "card-img-top", 
                               style: "height: 200px; object-fit: cover;" %>
                   
@@ -229,7 +229,7 @@
               <div class="card border-0 shadow-sm hover-card">
                 <div class="row g-0">
                   <div class="col-4">
-                    <%= image_tag nearby.image_url.presence || "/placeholder.svg?height=100&width=100", 
+                    <%= image_tag nearby.image_url.url.presence || "/placeholder.svg?height=100&width=100", 
                                 class: "img-fluid rounded-start", 
                                 style: "height: 100%; object-fit: cover;" %>
                   </div>

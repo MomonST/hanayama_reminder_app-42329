@@ -9,7 +9,7 @@
             <div class="d-flex align-items-center">
               <div class="me-3">
                 <% if @flower_mountain.flower.image_url.present? %>
-                  <%= image_tag @flower_mountain.flower.image_url, 
+                  <%= image_tag @flower_mountain.flower.image_url.url.presence || "/placeholder.svg", 
                       class: "rounded", style: "width: 60px; height: 60px; object-fit: cover;" %>
                 <% else %>
                   <div class="bg-light rounded d-flex align-items-center justify-content-center" 

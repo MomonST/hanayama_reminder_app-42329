@@ -270,7 +270,7 @@
               <% if @related_flowers.any? %>
                 <% @related_flowers.each do |related_flower| %>
                   <div class="d-flex align-items-center mb-3">
-                    <%= image_tag related_flower.image_url.presence || "/placeholder.svg?height=60&width=60", 
+                    <%= image_tag related_flower.image_url.url.presence || "/placeholder.svg?height=60&width=60", 
                                  class: "rounded me-3", 
                                  style: "width: 60px; height: 60px; object-fit: cover;" %>
                     <div>
