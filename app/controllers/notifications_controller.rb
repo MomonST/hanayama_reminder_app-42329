@@ -10,8 +10,16 @@ class NotificationsController < ApplicationController
   end
   
   def new
-    @notification = Notification.new
     @flower_mountain_id = params[:flower_mountain_id]
+
+    # 既存の通知設定を探す（現在のユーザーがこの花山スポットに対して既に通知設定しているか）
+    # params[:flower_mountain_id] がある場合のみ検索
+    if @flower_mountain_id.present?
+      @notification = current_user.notifications.find_by(flower_mountain_id: @flower_mountain_id)
+    end
+
+    # 見つからなければ新規作成
+    @notification ||= Notification.new
     @flower_mountain = FlowerMountain.find_by(id: @flower_mountain_id)
   end
   

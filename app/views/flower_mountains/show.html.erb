@@ -60,6 +60,11 @@
           <%= @favorites_count %>
           </button>
         <% end %>
+
+        <!-- お気に入りボタンとは別に、通知設定へのリンク -->
+        <%= link_to new_notification_path(flower_mountain_id: @flower_mountain.id), class: "btn btn-outline-primary btn-sm mt-2" do %>
+          <i class="bi bi-bell me-1"></i>この花の通知を設定
+        <% end %>   
       </div>
       
       <!-- 基本情報 -->
