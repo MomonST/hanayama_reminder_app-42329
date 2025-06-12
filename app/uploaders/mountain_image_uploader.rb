@@ -2,7 +2,7 @@ class MountainImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
   # 保存先
-  storage :file
+  # storage :file ←これがあるとproductionでもローカル保存される
 
   # 保存先のディレクトリ
   def store_dir

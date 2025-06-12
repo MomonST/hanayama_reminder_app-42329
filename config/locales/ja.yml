@@ -31,3 +31,7 @@ ja:
       post:
         content: "内容"
         image_url: "画像"
+
+  devise:
+    failure:
+      already_authenticated: "すでにログインしています"

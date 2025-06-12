@@ -2,7 +2,7 @@ class PostImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
   # 保存先
-  storage :file
+  # storage :file ←これがあるとproductionでもローカル保存されるので、削除
 
   # 保存先のディレクトリ
   def store_dir
