@@ -100,3 +100,5 @@ gem 'faraday'
 gem "geocoder"
 
 gem 'devise-i18n'                #Devise用日本語対応
+gem "aws-sdk-s3", require: false  #AWS S3 画像保存
+gem 'fog-aws'                    #Carrerwave用

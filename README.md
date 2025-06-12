@@ -102,6 +102,11 @@ https://hanayama-reminder-app-42329.onrender.com
 | **認証機能**        | Devise |
 | **デプロイ環境**     | Render |
 | **バージョン管理**    | GitHub |
+ 
+## その他
+画像アップロード ：carrierwave
+画像保存：AWS S3
+
 
 ## ローカルでの動作方法
 
