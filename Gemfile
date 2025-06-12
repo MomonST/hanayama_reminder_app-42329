@@ -98,3 +98,5 @@ gem 'faraday'
 
 # Geocoding
 gem "geocoder"
+
+gem 'devise-i18n'                #Devise用日本語対応
