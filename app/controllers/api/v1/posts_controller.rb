@@ -1,6 +1,6 @@
 module Api
   module V1
-    class PostsController < ApplicationController
+    class PostsController < ApiController
       skip_before_action :authenticate_user!, only: [:index, :show] # 基本的にAPIではセッション認証は不要
       before_action :authenticate_user!, only: [:create] # 例: APIトークン認証を導入する場合,authenticate_user_by_token!
       before_action :set_post, only: [:show]

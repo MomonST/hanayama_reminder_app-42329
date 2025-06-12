@@ -30,12 +30,10 @@ Rails.application.routes.draw do
     member do
       post :like
     end
-    # 投稿へのいいね作成 (POST /posts/:post_id/likes)
-    resources :likes, only: [:create]
   end
 
-  # いいねの削除 (DELETE /likes/:id) は単独のリソースとして定義
-  resources :likes, only: [:destroy]
+  # もし likes を独立したリソースとして管理し、よりRESTfulにしたい場合
+  resources :likes, only: [:create, :destroy]
   # --- posts と likes のルーティング統合はここまで ---
 
   # 通知関連
