@@ -113,7 +113,16 @@ function initLikeButtons() {
         },
         credentials: 'same-origin'
       })
-      .then(response => response.json())
+      .then(response => {
+        // HTTPステータスコードをチェックし、エラーならJSONパースせずにthrow
+        if (!response.ok) {
+          return response.text().then(text => { // エラー内容をログに出すためにテキストで取得
+            console.error('Server error response:', text);
+            throw new Error(`HTTP error! status: ${response.status}`);
+          });
+        }
+        return response.json(); // 成功時のみJSONとしてパース
+      })
       .then(data => {
         if (data.success) {
           // いいね状態を更新

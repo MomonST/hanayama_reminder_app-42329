@@ -62,6 +62,40 @@ class PostsController < ApplicationController
     @post.destroy
     redirect_to posts_path, notice: "投稿が削除されました"
   end
+
+  # --- ここからいいね機能の追加/修正 ---
+  def like
+    # いいね済みか確認
+    if current_user.likes.exists?(post: @post)
+      # 既にいいね済みの場合、いいねを解除
+      current_user.likes.find_by(post: @post).destroy
+      liked = false # いいね解除されたことを示すフラグ
+    else
+      # まだいいねしていない場合、いいねを作成
+      current_user.likes.create(post: @post)
+      liked = true # いいねされたことを示すフラグ
+    end
+
+    # 最新のいいね数を取得
+    likes_count = @post.likes.count
+
+    # JavaScript (Fetch API) からの要求に応えるため、JSON形式でレスポンスを返す
+    respond_to do |format|
+      format.json { render json: { success: true, liked: liked, likes_count: likes_count } }
+    end
+  rescue ActiveRecord::RecordNotFound
+    # 投稿が見つからない場合のエラーハンドリング
+    respond_to do |format|
+      format.json { render json: { success: false, message: '投稿が見つかりませんでした' }, status: :not_found }
+    end
+  rescue => e
+    # その他の予期せぬエラーハンドリング
+    Rails.logger.error "Like action error: #{e.message}" # エラーをログに出力
+    respond_to do |format|
+      format.json { render json: { success: false, message: 'エラーが発生しました' }, status: :internal_server_error }
+    end
+  end
+  # --- いいね機能の追加/修正はここまで ---
   
   private
   
