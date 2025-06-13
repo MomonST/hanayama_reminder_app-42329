@@ -74,7 +74,7 @@ https://hanayama-reminder-app-42329.onrender.com
 |[![Image from Gyazo](https://i.gyazo.com/b4577b3d1b4e502431c72daa39a7577d.gif)](https://gyazo.com/b4577b3d1b4e502431c72daa39a7577d)|ユーザー機能<br><br>・新規登録<br>・ログイン/ログアウト<br>・マイページ（プロフィール表示・編集）|
 |[![Image from Gyazo](https://i.gyazo.com/de060121fb8fd282f91f53d3ed6961d0.gif)](https://gyazo.com/de060121fb8fd282f91f53d3ed6961d0)|事前通知機能<br><br>・通知設定機能<br>・通知一覧機能<br>・通知詳細機能<br>・編集・削除機能 |
 |[![Image from Gyazo](https://i.gyazo.com/a5d71b19fb65edeb7c758adb630d15c1.gif)](https://gyazo.com/a5d71b19fb65edeb7c758adb630d15c1)|リアルタイム投稿機能<br><br>・写真投稿機能<br>・一覧機能<br>・詳細機能<br>・編集・削除機能|
-|[![Image from Gyazo](https://i.gyazo.com/4df9e6571b6a88c918dc972ea420234a.gif)](https://gyazo.com/4df9e6571b6a88c918dc972ea420234a)|投稿ランキング投稿機能<br><br>・一覧機能<br>・いいね機能<br>・検索機能|
+|[![Image from Gyazo](https://i.gyazo.com/4df9e6571b6a88c918dc972ea420234a.gif)](https://gyazo.com/4df9e6571b6a88c918dc972ea420234a)|投稿ランキング機能<br><br>・一覧機能<br>・いいね機能<br>・検索機能|
 |[![Image from Gyazo](https://i.gyazo.com/0c1042100d3f067e026743cf01d43a47.gif)](https://gyazo.com/0c1042100d3f067e026743cf01d43a47)|お気に入り機能<br><br>・一覧機能<br>・詳細表示機能<br>・追加・解除機能|
 |[![Image from Gyazo](https://i.gyazo.com/4fef42e684a9fca3b48dee73984a494a.gif)](https://gyazo.com/4fef42e684a9fca3b48dee73984a494a)|登山ルートフィルター機能|
 |[![Image from Gyazo](https://i.gyazo.com/3c3152cb9a0d5cfd85461c7ca6b2f84b.gif)](https://gyazo.com/3c3152cb9a0d5cfd85461c7ca6b2f84b)|検索機能<br><br>・地域別のエリア検索<br>・登山マップからの検索<br>・投稿の検索|
