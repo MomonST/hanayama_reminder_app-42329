@@ -1,4 +1,5 @@
 class SeedsController < ApplicationController
+  skip_forgery_protection
   # 注意！一時的にだけ公開して、すぐに削除or制限しよう
   def run
     if ENV['ALLOW_SEED'] == 'true'
