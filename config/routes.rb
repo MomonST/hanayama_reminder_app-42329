@@ -61,3 +61,7 @@ Rails.application.routes.draw do
     end
   end
 end
+
+if Rails.env.production?
+  post '/run_seeds', to: 'seeds#run'
+end
