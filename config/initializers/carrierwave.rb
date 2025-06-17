@@ -8,7 +8,11 @@ CarrierWave.configure do |config|
       region:                'ap-northeast-1' # 東京リージョンの例
     }
     config.fog_directory  = ENV['AWS_S3_BUCKET']
-    config.fog_public     = true
+     # これを削除または明示的にオフ
+    # config.fog_public     = true
+
+    # ACLを付与しないよう明示的に設定（fog-aws推奨方法）
+    config.fog_attributes = { }  # 空にしてACLなし
     config.storage        = :fog
   else
     config.storage = :file
