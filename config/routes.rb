@@ -60,9 +60,5 @@ Rails.application.routes.draw do
       resources :posts, only: [:index, :create, :show]
     end
   end
-
-  if Rails.env.production?
-    post '/run_seeds', to: 'seeds#run'
-  end
 end
 
