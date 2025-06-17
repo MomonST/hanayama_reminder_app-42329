@@ -9,7 +9,10 @@ CarrierWave.configure do |config|
     }
     config.fog_directory  = ENV['AWS_S3_BUCKET']
      
-    config.fog_public     = true
+    #config.fog_public     = true
+    
+    # ACLを無効にする設定（重要）
+    config.fog_attributes = {}  # ACLをつけない
     config.storage        = :fog
   else
     config.storage = :file
