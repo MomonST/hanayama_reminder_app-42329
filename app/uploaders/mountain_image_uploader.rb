@@ -1,8 +1,12 @@
 class MountainImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
-  # 保存先
-  # storage :file ←これがあるとproductionでもローカル保存される
+  # ★ここを追加（ローカルなら :file, 本番なら :fog に自動で切り替え）
+  if Rails.env.production?
+    storage :fog
+  else
+    storage :file
+  end
 
   # 保存先のディレクトリ
   def store_dir
