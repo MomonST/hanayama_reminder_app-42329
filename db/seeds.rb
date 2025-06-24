@@ -7,22 +7,22 @@ regions = User::REGIONS
 flowers = [
   { name: "ヤマザクラ", scientific_name: "Prunus jamasakura", bloom_start_month: 4, bloom_end_month: 5, 
     description: "日本を代表する桜の一種で、山地に自生しています。",
-    image_path: "public/uploads/flower/image_url/yamazakura.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/flowers/yamazakura.jpg" },
   { name: "ミツバツツジ", scientific_name: "Rhododendron dilatatum", bloom_start_month: 4, bloom_end_month: 5, 
     description: "春に鮮やかなピンク色の花を咲かせる日本固有のツツジです。",
-    image_path: "public/uploads/flower/image_url/mitsubatsutsuji.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/flowers/mitsubatsutsuji.jpg" },
   { name: "カタクリ", scientific_name: "Erythronium japonicum", bloom_start_month: 3, bloom_end_month: 4, 
     description: "春の妖精とも呼ばれる紫色の花を咲かせる山野草です。",
-    image_path: "public/uploads/flower/image_url/katakuri.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/flowers/katakuri.jpg" },
   { name: "シャクナゲ", scientific_name: "Rhododendron metternichii", bloom_start_month: 4, bloom_end_month: 6, 
     description: "美しい大輪の花を咲かせる常緑低木です。",
-    image_path: "public/uploads/flower/image_url/shakunage.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/flowers/shakunage.jpg" },
   { name: "ニッコウキスゲ", scientific_name: "Hemerocallis esculenta", bloom_start_month: 7, bloom_end_month: 8, 
     description: "夏の高原を彩る鮮やかなオレンジ色の花です。",
-    image_path: "public/uploads/flower/image_url/nikkoukisuge.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/flowers/nikkoukisuge.jpg" },
   { name: "レンゲツツジ", scientific_name: "Rhododendron japonicum", bloom_start_month: 5, bloom_end_month: 6, 
     description: "初夏に鮮やかな朱色の花を咲かせるツツジです。",
-    image_path: "public/uploads/flower/image_url/rengetsutsuji.jpg" }
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/flowers/rengetsutsuji.jpg" }
 ]
 
 # 山データ
@@ -30,43 +30,42 @@ mountains = [
   { name: "高尾山", region: "関東", difficulty_level: "初心者", elevation: 599, 
     latitude: 35.6253, longitude: 139.2437, 
     description: "東京都八王子市にある標高599mの山。年間約250万人が訪れる人気の山です。",
-    image_path: "public/uploads/mountain/image_url/takaosan.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/mountains/takaosan.jpg" },
   { name: "筑波山", region: "関東", difficulty_level: "初心者", elevation: 877, 
     latitude: 36.2258, longitude: 140.1069, 
     description: "茨城県つくば市にある標高877mの山。男体山と女体山の双峰からなります。",
-    image_path: "public/uploads/mountain/image_url/tsukubayama.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/mountains/tsukubayama.jpg" },
   { name: "丹沢山", region: "関東", difficulty_level: "中級者", elevation: 1567, 
     latitude: 35.4731, longitude: 139.1636, 
     description: "神奈川県の丹沢山地の主峰で、標高1567mの山です。",
-    image_path: "public/uploads/mountain/image_url/tanzawayama.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/mountains/tanzawayama.jpg" },
   { name: "富士山", region: "中部", difficulty_level: "上級者", elevation: 3776, 
     latitude: 35.3606, longitude: 138.7274, 
     description: "日本最高峰の山で、標高3776mの活火山です。",
-    image_path: "public/uploads/mountain/image_url/fujisan.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/mountains/fujisan.jpg" },
   { name: "大山", region: "中国", difficulty_level: "中級者", elevation: 1729, 
     latitude: 35.3711, longitude: 134.1869, 
     description: "鳥取県にある標高1729mの山。中国地方の最高峰です。",
-    image_path: "public/uploads/mountain/image_url/daisen.jpg" },
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/mountains/daisen.jpg" },
   { name: "屋久島宮之浦岳", region: "九州", difficulty_level: "上級者", elevation: 1936, 
     latitude: 30.3361, longitude: 130.5044, 
     description: "鹿児島県の屋久島にある標高1936mの山。九州最高峰です。",
-    image_path: "public/uploads/mountain/image_url/miyanoura.jpg" }
+    remote_image_url_url: "https://hanayama42329.s3.ap-northeast-1.amazonaws.com/mountains/miyanoura.jpg" }
 ]
 
 # 花データ作成
 puts "Creating flowers..."
 flowers.each do |flower_data|
-  image_file = File.open(Rails.root.join(flower_data[:image_path])) rescue nil
-  flower = Flower.find_or_initialize_by(name: flower_data[:name])  # 既存なら取得、なければ新規
-  
+  flower = Flower.find_or_initialize_by(name: flower_data[:name])
   flower.scientific_name = flower_data[:scientific_name]
   flower.bloom_start_month = flower_data[:bloom_start_month]
   flower.bloom_end_month = flower_data[:bloom_end_month]
   flower.description = flower_data[:description]
-  
-  # 画像が未登録なら代入
-  if flower.image_url.blank? && image_file
-    flower.image_url = image_file
+  flower.remote_image_url_url = flower_data[:remote_image_url_url]
+
+  # remote_image_url にURLを直接渡す
+  if flower.image_url.blank?
+    flower.remote_image_url_url = flower_data[:image_url] # ←ここ
   end
 
   flower.save!
@@ -75,21 +74,20 @@ end
 # 山データ作成
 puts "Creating mountains..."
 mountains.each do |mountain_data|
-  image_file = File.open(Rails.root.join(mountain_data[:image_path])) rescue nil
   mountain = Mountain.find_or_initialize_by(name: mountain_data[:name])
-
   mountain.region = mountain_data[:region]
   mountain.difficulty_level = mountain_data[:difficulty_level]
   mountain.elevation = mountain_data[:elevation]
   mountain.latitude = mountain_data[:latitude]
   mountain.longitude = mountain_data[:longitude]
   mountain.description = mountain_data[:description]
-  
-  # 画像が未登録なら代入
-  if mountain.image_url.blank? && image_file
-    mountain.image_url = image_file
+  mountain.remote_image_url_url = mountain_data[:remote_image_url_url]
+
+  # remote_image_url にURLを直接渡す
+  if mountain.image_url.blank?
+    mountain.remote_image_url_url = mountain_data[:image_url] # ←ここ
   end
-  
+
   mountain.save!
 end
 
