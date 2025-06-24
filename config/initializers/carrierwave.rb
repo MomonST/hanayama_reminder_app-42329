@@ -11,8 +11,8 @@ CarrierWave.configure do |config|
      
     config.fog_public     = true
     
-    # ACLを無効→有効に変更
-    config.fog_attributes = { cache_control: "public, max-age=86400" } # or 空でもOK
+    # ACLを無効
+    config.fog_attributes = {} 
     config.storage        = :fog
   else
     config.storage = :file
