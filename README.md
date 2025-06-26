@@ -78,6 +78,7 @@ https://hanayama-reminder-app-42329.onrender.com
 |[![Image from Gyazo](https://i.gyazo.com/0c1042100d3f067e026743cf01d43a47.gif)](https://gyazo.com/0c1042100d3f067e026743cf01d43a47)|お気に入り機能<br><br>・一覧機能<br>・詳細表示機能<br>・追加・解除機能|
 |[![Image from Gyazo](https://i.gyazo.com/4fef42e684a9fca3b48dee73984a494a.gif)](https://gyazo.com/4fef42e684a9fca3b48dee73984a494a)|登山ルートフィルター機能|
 |[![Image from Gyazo](https://i.gyazo.com/3c3152cb9a0d5cfd85461c7ca6b2f84b.gif)](https://gyazo.com/3c3152cb9a0d5cfd85461c7ca6b2f84b)|検索機能<br><br>・地域別のエリア検索<br>・登山マップからの検索<br>・投稿の検索|
+|[![Image from Gyazo](https://i.gyazo.com/1747b187811f13d59ea63e087a8e2bbd.gif)](https://gyazo.com/1747b187811f13d59ea63e087a8e2bbd)|（追加実装）<br>管理機能<br><br>・データ集計機能<br>・花・山のデータ編集機能<br>・ユーザー管理機能<br>・投稿管理機能|
 
 ## 実装予定の機能
 - 「エリア登録」  
@@ -160,7 +161,6 @@ https://hanayama-reminder-app-42329.onrender.com
 - ルート詳細情報：MAP連携の修正（標高・向きなど）
 - 花山情報のデータ蓄積：ユーザー参加型で年々精度が向上する学習システム
 - YAMAPの日記投稿機能との連携
-- 管理者ページを作成
 - Googleカレンダー連携
 - いいね機能追加
 
