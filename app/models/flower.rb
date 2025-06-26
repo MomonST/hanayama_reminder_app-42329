@@ -60,4 +60,12 @@ class Flower < ApplicationRecord
   def favorites_count
     flower_mountains.joins(:favorites).count
   end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["flower_mountains", "mountains", "posts", "favorites", "likes", "liked_users"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[name scientific_name bloom_start_month bloom_end_month description image_url created_at updated_at]
+  end
 end

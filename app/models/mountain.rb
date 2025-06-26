@@ -72,4 +72,12 @@ class Mountain < ApplicationRecord
   def favorites_count
     flower_mountains.joins(:favorites).count
   end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["flower_mountains", "flowers", "posts", "favorites"] # 必要な関連のみ
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[name region difficulty_level elevation latitude longitude description image_url created_at updated_at]
+  end
 end

@@ -38,9 +38,14 @@ class Post < ApplicationRecord
   def likes_count
     post_likes.count
   end
-  
-  # 画像アップロード（CarrierWaveを使用する場合）
-  # mount_uploader :image_url, ImageUploader
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[content created_at flower_mountain_id id id_value image_url likes_count updated_at user_id mountain_id]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["user", "flower_mountain", "mountain"]
+  end
 
   private
 

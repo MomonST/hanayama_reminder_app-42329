@@ -50,4 +50,12 @@ class FlowerMountain < ApplicationRecord
     
     (peak_date - today).to_i
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "flower_id", "mountain_id", "peak_month", "bloom_info", "created_at", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    [] # flower や mountain に絞りたければ ["flower", "mountain"]
+  end
 end

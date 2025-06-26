@@ -11,23 +11,24 @@ ActiveAdmin.register_page "Dashboard" do
     end
 
     # Here is an example of a simple dashboard with columns and panels.
-    #
-    # columns do
-    #   column do
-    #     panel "Recent Posts" do
-    #       ul do
-    #         Post.recent(5).map do |post|
-    #           li link_to(post.title, admin_post_path(post))
-    #         end
-    #       end
-    #     end
-    #   end
+    columns do
+      column do
+        panel "最新の投稿（Post）" do
+          ul do
+            Post.order(created_at: :desc).limit(5).map do |post|
+              li link_to("#{post.user.nickname}さんの投稿", admin_post_path(post))
+            end
+          end
+        end
+      end
 
-    #   column do
-    #     panel "Info" do
-    #       para "Welcome to ActiveAdmin."
-    #     end
-    #   end
-    # end
+      column do
+        panel "登録済みデータ数" do
+          para "花: #{Flower.count} 件"
+          para "山: #{Mountain.count} 件"
+          para "ユーザー: #{User.count} 人"
+        end
+      end
+    end
   end # content
 end
