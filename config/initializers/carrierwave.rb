@@ -12,7 +12,7 @@ CarrierWave.configure do |config|
     #config.fog_public     = true
     
     # ACLを無効
-    config.fog_attributes = {} 
+    #config.fog_attributes = {} 
     config.storage        = :fog
   else
     config.storage = :file
