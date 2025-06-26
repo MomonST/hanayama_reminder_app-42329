@@ -34,4 +34,14 @@ class User < ApplicationRecord
   def favorited_flower_mountain?(flower_mountain)
     favorites.exists?(flower_mountain: flower_mountain)
   end
+
+  # ActiveAdminでの検索を許可する属性
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id email nickname first_name last_name first_name_kana last_name_kana region birth_date created_at updated_at]
+  end
+
+  # ActiveAdminでの検索を許可する関連
+  def self.ransackable_associations(auth_object = nil)
+    %w[posts likes]
+  end
 end

@@ -136,3 +136,5 @@ if Rails.env.development?
 end
 
 puts "Seed data created successfully!"
+
+AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?

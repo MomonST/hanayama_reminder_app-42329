@@ -81,6 +81,13 @@ class Notification < ApplicationRecord
     "#{flower_mountain.mountain.name}で#{flower_mountain.flower.name}が見頃です！通知は#{days_before}日前です。"
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id user_id post_id action checked created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[user flower_mountain]
+  end
 
   private
   
