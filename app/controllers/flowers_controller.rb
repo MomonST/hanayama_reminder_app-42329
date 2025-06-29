@@ -144,8 +144,4 @@ class FlowersController < ApplicationController
     params.require(:flower).permit(:name, :scientific_name, :description, :blooming_season, 
                                   :peak_period, :image_url, :characteristics, :habitat)
   end
-
-  #def admin_required
-    #redirect_to root_path, alert: '管理者権限が必要です。' unless current_user&.admin?
-  #end
 end
