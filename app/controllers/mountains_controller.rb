@@ -1,5 +1,5 @@
 class MountainsController < ApplicationController
-  before_action :set_mountain, only: [:show]
+  before_action :set_mountain, only: [:show, :edit, :update, :destroy]
   before_action :authenticate_user!, except: [:index, :show]
   # before_action :admin_required, only: [:new, :create, :edit, :update, :destroy]
 
@@ -64,7 +64,7 @@ class MountainsController < ApplicationController
 
   def show
     @flower_mountains = @mountain.flower_mountains.includes(:flower)
-    @recent_posts = Post.joins(:flower_mountain).where(flower_mountains: { mountain_id: @mountain.id }).order(created_at: :desc).limit(6)
+    @recent_posts = Post.where(mountain_id: @mountain.id).order(created_at: :desc).limit(6)
     
     # 現在見頃の花
     @blooming_now = @mountain.flowers.select(&:blooming_now?)
@@ -87,7 +87,6 @@ class MountainsController < ApplicationController
     else
       @nearby_mountains = []
     end
-    
   end
 
   def new
@@ -105,12 +104,9 @@ class MountainsController < ApplicationController
   end
 
   def edit
-    @mountain = Mountain.find(params[:id])
   end
 
   def update
-    @mountain = Mountain.find(params[:id])
-    
     if @mountain.update(mountain_params)
       redirect_to @mountain, notice: '山の情報が正常に更新されました。'
     else
@@ -119,7 +115,6 @@ class MountainsController < ApplicationController
   end
 
   def destroy
-    @mountain = Mountain.find(params[:id])
     @mountain.destroy
     redirect_to mountains_path, notice: '山の情報が削除されました。'
   end

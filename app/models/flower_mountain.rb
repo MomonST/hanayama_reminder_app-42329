@@ -4,7 +4,6 @@ class FlowerMountain < ApplicationRecord
   belongs_to :mountain
   has_many :notifications, dependent: :destroy
   has_many :favorites, dependent: :destroy
-  has_many :posts, dependent: :destroy
   
   # バリデーション
   validates :flower_id, uniqueness: { scope: :mountain_id }

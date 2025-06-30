@@ -145,7 +145,7 @@
                   
                   <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted">
-                      投稿: <%= flower_mountain.posts.count %>件
+                      投稿: <%= Post.where(flower_id: flower_mountain.flower_id, mountain_id: flower_mountain.mountain_id).count %>件
                     </small>
                     <%= link_to "詳細", mountain_path(flower_mountain.mountain), 
                                class: "btn btn-outline-success btn-sm" %>

@@ -40,7 +40,12 @@ class FlowerMountainsController < ApplicationController
   
   def show
     @flower_mountain = FlowerMountain.includes(:flower, :mountain).find(params[:id])
-    @posts = @flower_mountain.posts.recent.includes(:user).page(params[:page]).per(5)
+    @posts = Post.where(flower_id: @flower_mountain.flower_id, mountain_id: @flower_mountain.mountain_id)
+                  .recent
+                  .includes(:user)
+                  .page(params[:page])
+                  .per(5)
+
     # 関連する花山の取得
     @related_flower_mountains = FlowerMountain.where(flower_id: @flower_mountain.flower_id)
                                               .where.not(id: @flower_mountain.id)
