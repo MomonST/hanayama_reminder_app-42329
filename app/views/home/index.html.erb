@@ -175,7 +175,15 @@
               
               <div class="card-body">
                 <h6 class="card-title mb-1">
-                  <%= post.flower_mountain.mountain.name %> - <%= post.flower_mountain.flower.name %>
+                  <% if post.mountain.present? && post.flower.present? %>
+                    <%= post.mountain.name %> - <%= post.flower.name %>
+                  <% elsif post.mountain.present? %>
+                    <%= post.mountain.name %>
+                  <% elsif post.flower.present? %>
+                    <%= post.flower.name %>
+                  <% else %>
+                    不明なスポット
+                  <% end %>
                 </h6>
                 <p class="text-muted small mb-2">
                   <i class="bi bi-person-circle me-1"></i><%= post.user.nickname %>

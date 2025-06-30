@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   before_action :authorize_user!, only: [:edit, :update, :destroy]
   
   def index
-    @posts = Post.includes(:user, flower_mountain: [:flower, :mountain])
+    @posts = Post.includes(:user, :flower, :mountain)
     
     # ソート順
     case params[:sort]
@@ -15,10 +15,10 @@ class PostsController < ApplicationController
     end
     
     # 地域でフィルタリング
-    @posts = @posts.joins(flower_mountain: :mountain).where(mountains: { region: params[:region] }) if params[:region].present?
+    @posts = @posts.where(mountain_id: Mountain.find_by(region: params[:region])&.id) if params[:region].present?
     
     # 花でフィルタリング
-    @posts = @posts.joins(flower_mountain: :flower).where(flowers: { id: params[:flower_id] }) if params[:flower_id].present?
+    @posts = @posts.where(flower_id: params[:flower_id]) if params[:flower_id].present?
     
     @posts = @posts.page(params[:page]).per(12)
   end
@@ -30,8 +30,8 @@ class PostsController < ApplicationController
   
   def new
     @post = Post.new
-    @flower_mountain_id = params[:flower_mountain_id]
-    @flower_mountains = FlowerMountain.includes(:flower, :mountain).all
+    @flowers = Flower.all
+    @mountains = Mountain.all
   end
   
   def create
@@ -40,20 +40,23 @@ class PostsController < ApplicationController
     if @post.save
       redirect_to @post, notice: "投稿が作成されました"
     else
-      @flower_mountains = FlowerMountain.includes(:flower, :mountain).all
+      @flowers = Flower.all
+      @mountains = Mountain.all
       render :new
     end
   end
   
   def edit
-    @flower_mountains = FlowerMountain.includes(:flower, :mountain).all
+    @flowers = Flower.all
+    @mountains = Mountain.all
   end
   
   def update
     if @post.update(post_params)
       redirect_to @post, notice: "投稿を更新しました"
     else
-      @flower_mountains = FlowerMountain.includes(:flower, :mountain).all
+      @flowers = Flower.all
+      @mountains = Mountain.all
       render :edit
     end
   end
@@ -104,7 +107,7 @@ class PostsController < ApplicationController
   end
   
   def post_params
-    params.require(:post).permit(:flower_mountain_id, :content, :image_url)
+    params.require(:post).permit(:content, :image_url, :flower_id, :mountain_id)
   end
   
   def authorize_user!

@@ -1,7 +1,7 @@
 class Post < ApplicationRecord
   # アソシエーション
   belongs_to :user
-  belongs_to :flower_mountain
+  belongs_to :flower, optional: true
   belongs_to :mountain, optional: true
   has_many :likes, dependent: :destroy
   has_many :post_likes, dependent: :destroy
@@ -40,17 +40,17 @@ class Post < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[content created_at flower_mountain_id id id_value image_url likes_count updated_at user_id mountain_id]
+    %w[content created_at flower_id mountain_id id id_value image_url likes_count updated_at user_id]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["user", "flower_mountain", "mountain"]
+    ["user", "flower", "mountain"]
   end
 
   private
 
   def flower_or_mountain_present
-    if flower_mountain.nil? || (flower_mountain.flower.nil? && flower_mountain.mountain.nil?)
+    if flower.nil? && mountain.nil?
       errors.add(:base, "花または山のどちらかを選択してください")
     end
   end

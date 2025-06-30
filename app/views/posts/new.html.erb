@@ -17,11 +17,15 @@
           <% end %>
           
           <div class="mb-3">
-            <%= f.label :flower_mountain_id, "花山スポット", class: "form-label" %>
-            <%= f.collection_select :flower_mountain_id, @flower_mountains, :id, 
-                ->(fm) { "#{fm.mountain.name} - #{fm.flower.name}" }, 
-                { selected: @flower_mountain_id, include_blank: "選択してください" }, 
-                class: "form-select", required: true %>
+            <%= f.label :flower_id, "花の種類", class: "form-label" %>
+            <%= f.collection_select :flower_id, @flowers, :id, :name,
+                { include_blank: "選択してください" }, class: "form-select" %>
+          </div>
+          
+          <div class="mb-3">
+            <%= f.label :mountain_id, "山の名前", class: "form-label" %>
+            <%= f.collection_select :mountain_id, @mountains, :id, :name,
+                { include_blank: "選択してください" }, class: "form-select" %>
           </div>
           
           <div class="mb-3">

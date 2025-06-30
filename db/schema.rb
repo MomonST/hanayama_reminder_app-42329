@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_24_102349) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_30_080517) do
   create_table "active_admin_comments", charset: "utf8mb3", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -116,13 +116,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_24_102349) do
 
   create_table "posts", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "flower_mountain_id", null: false
     t.text "content"
     t.string "image_url"
     t.integer "likes_count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["flower_mountain_id"], name: "index_posts_on_flower_mountain_id"
+    t.bigint "flower_id", null: false
+    t.bigint "mountain_id", null: false
+    t.index ["flower_id"], name: "index_posts_on_flower_id"
+    t.index ["mountain_id"], name: "index_posts_on_mountain_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -156,6 +158,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_24_102349) do
   add_foreign_key "notifications", "users"
   add_foreign_key "post_likes", "posts"
   add_foreign_key "post_likes", "users"
-  add_foreign_key "posts", "flower_mountains"
   add_foreign_key "posts", "users"
 end

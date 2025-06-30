@@ -92,14 +92,14 @@
               
               <!-- 花・山バッジ -->
               <div class="position-absolute bottom-0 start-0 m-2">
-                <% if post.flower_mountain&.flower %>
+                <% if post.flower %>
                   <span class="badge bg-pink me-1">
-                    <i class="fas fa-seedling me-1"></i><%= post.flower_mountain.flower.name %>
+                    <i class="fas fa-seedling me-1"></i><%= post.flower.name %>
                   </span>
                 <% end %>
-                <% if post.flower_mountain&.mountain %>
+                <% if post.mountain %>
                   <span class="badge bg-success">
-                    <i class="fas fa-mountain me-1"></i><%= post.flower_mountain.mountain.name %>
+                    <i class="fas fa-mountain me-1"></i><%= post.mountain.name %>
                   </span>
                 <% end %>
               </div>
