@@ -33,8 +33,6 @@
                   <%= link_to toggle_favorites_path(flower_mountain_id: @flower_mountains.first.id), # flower_mountainsが複数ある場合は適切に選択
                                 class: "favorite-button btn btn-sm #{current_user.favorites.exists?(flower_mountain: @flower_mountains.first) ? 'btn-warning' : 'btn-outline-warning'}",
                                 data: {
-                                # JavaScriptの initFavoriteButtons が href と POST を使うため、data-method/data-turbo-method は不要
-                                # data-flower-mountain-id: @flower_mountains.first.id # JSで必要なら追加
                                 } do %>
                     <i class="bi <%= current_user.favorites.exists?(flower_mountain: @flower_mountains.first) ? 'bi-star-fill' : 'bi-star' %> me-2"></i>
                     <%= current_user.favorites.exists?(flower_mountain: @flower_mountains.first) ? 'お気に入り解除' : 'お気に入りに追加' %>

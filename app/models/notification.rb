@@ -1,15 +1,13 @@
 class Notification < ApplicationRecord
   # アソシエーション
   belongs_to :user
-  belongs_to :flower_mountain
+  belongs_to :flower
+  belongs_to :mountain
   
   # バリデーション
-  # validates :title, presence: true
-  # validates :message, presence: true
   validates :days_before, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
-  validates :user_id, presence: true, uniqueness: { scope: :flower_mountain_id, message: "既にこの花山スポットの通知が設定されています" }
+  validates :user_id, presence: true, uniqueness: { scope: [:flower_id, :mountain_id], message: "既にこの花山スポットの通知が設定されています" }
   validates :notification_date, presence: true
-  validates :flower_mountain_id, presence: true
   validates :notification_type, presence: true, inclusion: { in: %w(flower_blooming reminder like comment system) } 
 
   # 通知日の自動計算
@@ -61,24 +59,41 @@ class Notification < ApplicationRecord
     end
   end
 
-  def flower
-    flower_mountain.flower
-  end
-
-  def mountain
-    flower_mountain.mountain
-  end
-
   def mark_as_sent!
     update(sent: true)
   end
 
   def title
-    "#{flower_mountain.flower.name} 見頃通知"
+    "#{flower.name} 見頃通知"
   end
 
   def message
-    "#{flower_mountain.mountain.name}で#{flower_mountain.flower.name}が見頃です！通知は#{days_before}日前です。"
+    "#{mountain.name}で#{flower.name}が見頃です！通知は#{days_before}日前です。"
+  end
+
+  def estimated_peak_month
+    return nil unless flower.present?
+
+    today = Date.today
+    current_year = today.year
+
+    # 見頃の中央値を仮定（月の中央値＝開始と終了の間）
+    if flower.bloom_start_month && flower.bloom_end_month
+      average_month = ((flower.bloom_start_month + flower.bloom_end_month) / 2.0).round
+      return average_month
+    end
+
+    nil
+  end
+
+  # 見頃までの日数
+  def days_until_peak
+    return nil unless estimated_peak_month
+
+    today = Date.today
+    peak_date = Date.new(today.year, estimated_peak_month, 15)
+    peak_date += 1.year if peak_date < today
+    (peak_date - today).to_i
   end
 
   def self.ransackable_attributes(auth_object = nil)
@@ -93,20 +108,18 @@ class Notification < ApplicationRecord
   
   # 通知日を計算（見頃の日付から指定日数前）
   def calculate_notification_date
-    return unless flower_mountain.present? && days_before.present?
+    return unless flower.present? && mountain.present? && days_before.present?
 
-    peak_month = flower_mountain.peak_month
-    return unless peak_month
-    
-    today = Date.today
-    peak_date = Date.new(today.year, peak_month, 15) # 月の中旬を見頃と仮定
-    
-    # 既に今年の見頃が過ぎていれば来年の見頃を対象にする
-    if peak_date < today
-      peak_date = Date.new(today.year + 1, peak_month, 15)
+    # FlowerMountain に依存せず flower 側の bloom_start_month を使う
+    if flower.bloom_start_month.present?
+      peak_month = flower.bloom_start_month
+      peak_date = Date.new(Date.today.year, peak_month, 15)  # 月の中旬を見頃と仮定
+      peak_date += 1.year if peak_date < Date.today
+      # 既に今年の見頃が過ぎていれば来年の見頃を対象にする
+      self.notification_date = peak_date - days_before.days
+    else
+      # fallback：デフォルトや通知日未設定
+      self.notification_date = nil
     end
-    
-    self.notification_date = peak_date - days_before.days
-    
   end
 end

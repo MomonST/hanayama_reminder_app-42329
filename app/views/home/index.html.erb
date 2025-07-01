@@ -32,23 +32,23 @@
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <h5 class="card-title mb-0">
                   <i class="bi bi-flower1 text-pink me-1"></i>
-                  <%= notification.flower_mountain.flower.name %>
+                  <%= notification.flower.name %>
                 </h5>
                 <span class="badge bg-light text-dark">
-                  <%= notification.flower_mountain.mountain.difficulty_level %>
+                  <%= notification.mountain.difficulty_level %>
                 </span>
               </div>
               
               <p class="text-muted mb-2">
                 <i class="bi bi-geo-alt me-1"></i>
-                <%= notification.flower_mountain.mountain.name %> 
-                (<%= notification.flower_mountain.mountain.region %>)
+                <%= notification.mountain.name %> 
+                (<%= notification.mountain.region %>)
               </p>
               
               <div class="d-flex mt-3">
                 <div class="me-3">
-                  <% if notification.flower_mountain.flower.image_url.present? %>
-                    <%= image_tag notification.flower_mountain.flower.image_url.url.presence || "/placeholder.svg",
+                  <% if notification.flower.image_url.present? %>
+                    <%= image_tag notification.flower.image_url.url.presence || "/placeholder.svg",
                         class: "rounded", style: "width: 80px; height: 80px; object-fit: cover;" %>
                   <% else %>
                     <div class="bg-light rounded d-flex align-items-center justify-content-center" 
@@ -59,11 +59,10 @@
                 </div>
                 
                 <div>
-                  <% days_left = notification.flower_mountain.days_until_peak %>
-                  <% if days_left %>
-                    <div class="fs-4 fw-bold text-success mb-1">あと<%= days_left %>日</div>
+                  <% if notification.days_until_peak %>
+                    <div class="fs-4 fw-bold text-success mb-1">あと<%= notification.days_until_peak %>日</div>
                     <p class="text-muted small mb-2">
-                      見頃予想: <%= notification.flower_mountain.peak_month %>月中旬
+                      見頃予想: <%= notification.estimated_peak_month %>月中旬
                     </p>
                   <% else %>
                     <div class="fs-5 fw-bold text-muted mb-1">時期未定</div>
@@ -73,8 +72,11 @@
                     <a href="#" class="btn btn-sm btn-success">
                       <i class="bi bi-calendar-plus me-1"></i>カレンダー
                     </a>
-                    <%= link_to flower_mountain_path(notification.flower_mountain), class: "btn btn-sm btn-outline-secondary" do %>
-                      詳細
+                    <%= link_to flower_path(notification.flower), class: "btn btn-sm btn-outline-secondary" do %>
+                      花の詳細
+                    <% end %>
+                    <%= link_to mountain_path(notification.mountain), class: "btn btn-sm btn-outline-secondary" do %>
+                      山の詳細
                     <% end %>
                   </div>
                 </div>

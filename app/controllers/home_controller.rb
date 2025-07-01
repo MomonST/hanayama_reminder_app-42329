@@ -21,7 +21,7 @@ class HomeController < ApplicationController
     
     # 通知設定済みの花山情報を取得
     @notifications = current_user.notifications
-                                .includes(flower_mountain: [:flower, :mountain])
+                                .includes(:flower, :mountain)
                                 .order(:notification_date)
                                 .limit(4)
     
