@@ -5,6 +5,8 @@ import "controllers"
 // Bootstrap を importmap 経由で読み込む
 import * as bootstrap from "bootstrap"
 import "jquery"
+import Rails from "@rails/ujs"
+Rails.start()
 
 // グローバル変数
 window.HanayamaReminder = window.HanayamaReminder || {}; // 複数箇所で定義されないよう調整

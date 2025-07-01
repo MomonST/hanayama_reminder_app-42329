@@ -7,10 +7,10 @@ ActiveAdmin.register Post do
   #
   permit_params :user_id, :flower_mountain_id, :mountain_id, :content, :image_url, :likes_count
 
-  # 必要なものだけフィルターを定義（任意）
+  # 必要なものだけフィルターを定義
   filter :content
   filter :user_id
-  filter :flower_mountain_id
+  filter :flower_id
   filter :mountain_id
   filter :created_at
 
@@ -19,7 +19,7 @@ ActiveAdmin.register Post do
     id_column
     column :content
     column :user
-    column :flower_mountain
+    column :flower
     column :mountain
     column :likes_count
     column :created_at
@@ -29,7 +29,7 @@ ActiveAdmin.register Post do
   form do |f|
     f.inputs do
       f.input :user
-      f.input :flower_mountain
+      f.input :flower
       f.input :mountain
       f.input :content
       f.input :image_url, as: :file

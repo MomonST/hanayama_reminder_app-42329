@@ -6,7 +6,7 @@ module Api
       before_action :set_post, only: [:show]
       
       def index
-         @posts = Post.includes(:user, flower_mountain: [:flower, :mountain]).recent
+         @posts = Post.includes(:user, :flower, :mountain).recent
         
         # 検索・フィルタリング
         if params[:search].present?
@@ -44,12 +44,8 @@ module Api
             methods: [:likes_count],
             include: {
               user: { only: [:id, :nickname] },
-              flower_mountain: {
-                include: {
-                  flower: { only: [:id, :name] },
-                  mountain: { only: [:id, :name, :region] }
-                }
-              }
+              flower: { only: [:id, :name] },
+              mountain: { only: [:id, :name, :region] }
             }
           ),
           meta: {
@@ -69,12 +65,8 @@ module Api
             methods: [:likes_count],
             include: {
               user: { only: [:id, :nickname] },
-              flower_mountain: {
-                include: {
-                  flower: { only: [:id, :name, :image_url] },
-                  mountain: { only: [:id, :name, :region, :elevation] }
-                }
-              }
+              flower: { only: [:id, :name, :image_url] },
+              mountain: { only: [:id, :name, :region, :elevation] }
             }
           )
         }
@@ -90,12 +82,8 @@ module Api
               only: [:id, :content, :image_url, :created_at],
               include: {
                 user: { only: [:id, :nickname] },
-                flower_mountain: {
-                  include: {
-                    flower: { only: [:id, :name] },
-                    mountain: { only: [:id, :name] }
-                  }
-                }
+                flower: { only: [:id, :name] },
+                mountain: { only: [:id, :name] }
               }
             )
           }, status: :created
@@ -114,7 +102,7 @@ module Api
       end
       
       def post_params
-        params.require(:post).permit(:content, :image_url, :flower_mountain_id, :taken_at)
+        params.require(:post).permit(:content, :image_url, :flower_id, :mountain_id, :taken_at)
       end
 
       # 例: APIトークン認証のメソッド (実際の認証ロジックはUserモデルや別のconcernで定義)

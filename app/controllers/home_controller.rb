@@ -26,7 +26,7 @@ class HomeController < ApplicationController
                                 .limit(4)
     
     # 人気の投稿を取得
-    @popular_posts = Post.popular.includes(:user, flower_mountain: [:flower, :mountain]).limit(3)
+    @popular_posts = Post.popular.includes(:user, :flower, :mountain).limit(3)
 
     # 現在見頃の花
     @blooming_flowers = Flower.blooming_now.limit(4)

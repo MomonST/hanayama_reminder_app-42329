@@ -1,5 +1,5 @@
 class FlowersController < ApplicationController
-  before_action :set_flower, only: [:show]
+  before_action :set_flower, only: [:show, :edit, :update, :destroy]
   before_action :authenticate_user!, except: [:index, :show]
   #before_action :admin_required, only: [:new, :create, :edit, :update, :destroy]
 
@@ -42,21 +42,15 @@ class FlowersController < ApplicationController
   end
 
   def show
-    @flower_mountains = @flower.flower_mountains.includes(:mountain, :posts)
-    @recent_posts = Post.joins(:flower_mountain)
-                        .where(flower_mountains: { flower_id: @flower.id })
-                        .order(created_at: :desc)
-                        .limit(6)
+    @flower_mountains = @flower.flower_mountains.includes(:mountain)
+    @recent_posts = Post.where(flower_id: @flower.id).order(created_at: :desc).limit(6)
     
     # いいね機能：flowers_controller.rb の showアクションに追加
     @favorites_count = Favorite.joins(:flower_mountain).where(flower_mountains: { flower_id: @flower.id }).count
     # いいね機能：「ユーザーがお気に入りにしてるか」も必要なら
     @is_favorited = user_signed_in? ? current_user.favorites.joins(:flower_mountain).exists?(flower_mountains: { flower_id: @flower.id }) : false
     # いいね機能：flowerに関連する「投稿のいいね合計」を表示する場合
-    @total_post_likes = Post.joins(flower_mountain: :flower)
-                         .where(flower_mountains: { flower_id: @flower.id })
-                         .joins(:post_likes)
-                         .count
+    @total_post_likes = Post.where(flower_id: @flower.id).joins(:post_likes).count
     
     # 関連する花（同じ季節の花）
     @related_flowers = Flower.all
@@ -92,12 +86,9 @@ class FlowersController < ApplicationController
   end
 
   def edit
-    @flower = Flower.find(params[:id])
   end
 
   def update
-    @flower = Flower.find(params[:id])
-    
     if @flower.update(flower_params)
       redirect_to @flower, notice: '花の情報が正常に更新されました。'
     else
@@ -106,7 +97,6 @@ class FlowersController < ApplicationController
   end
 
   def destroy
-    @flower = Flower.find(params[:id])
     @flower.destroy
     redirect_to flowers_path, notice: '花の情報が削除されました。'
   end

@@ -37,7 +37,6 @@
       <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places" async defer>
       </script>
     <% end %>
-    
   </head>
 
   <body class="gradient-bg">
@@ -138,12 +137,11 @@
 
       // マーカーを地図に追加 (initMapの前に定義が必要)
       function addMarkersToMap(locations) {
-        // 既存のマーカーをマップから削除し、配列をクリア
-        if (window.HanayamaReminder.markers) { // 存在チェック
+        // 既存のマーカーをマップから削除し、配列をクリア // 存在チェック
+        if (window.HanayamaReminder.markers) {
           window.HanayamaReminder.markers.forEach(m => m.marker.setMap(null)); // 修正: m.marker にアクセス
         }
         window.HanayamaReminder.markers = []; // 新しい配列で初期化
-        
         const bounds = new google.maps.LatLngBounds();
         
         locations.forEach(location => {

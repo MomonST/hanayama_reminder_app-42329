@@ -70,7 +70,7 @@
                 <div class="col-4">
                   <div class="border rounded p-3">
                     <h4 class="text-primary mb-1">
-                      <%= Post.joins(:flower_mountain).where(flower_mountains: { mountain_id: @mountain.id }).count %>
+                      <%= Post.where(mountain_id: @mountain.id).count %>
                     </h4>
                     <small class="text-muted">投稿数</small>
                   </div>
@@ -166,7 +166,7 @@
                   
                   <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted">
-                      投稿: <%= flower_mountain.posts.count %>件
+                      投稿: <%= Post.where(flower_id: flower_mountain.flower_id, mountain_id: flower_mountain.mountain_id).count %>件
                     </small>
                     <%= link_to "詳細", flower_path(flower_mountain.flower), 
                               class: "btn btn-outline-success btn-sm" %>

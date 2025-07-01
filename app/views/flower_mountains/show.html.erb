@@ -199,9 +199,11 @@
     </div>
     
     <div class="text-center mb-5">
-      <%= link_to posts_path(flower_id: @flower_mountain.flower.id, mountain_id: @flower_mountain.mountain.id), 
-                  class: "btn btn-outline-primary" do %>
-        <i class="fas fa-images me-1"></i>すべての投稿を見る
+      <% if @flower_mountain&.flower && @flower_mountain&.mountain %>
+        <%= link_to posts_path(flower_id: @flower_mountain.flower.id, mountain_id: @flower_mountain.mountain.id), 
+                    class: "btn btn-outline-primary" do %>
+          <i class="fas fa-images me-1"></i>すべての投稿を見る
+        <% end %>
       <% end %>
     </div>
   <% end %>

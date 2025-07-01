@@ -34,12 +34,14 @@
             </div>
             
             <div class="row mb-4">
-              <div class="col-md-12">
-                <%= f.label :flower_mountain_id, "花と山", class: "form-label" %>
-                <%= f.collection_select :flower_mountain_id, @flower_mountains, :id, 
-                    ->(fm) { "#{fm.flower.name} (#{fm.mountain.name})" }, 
-                    { include_blank: "選択してください" }, 
-                    { class: "form-select", required: true } %>
+              <div class="col-md-6">
+                <%= f.label :flower_id, "花", class: "form-label" %>
+                <%= f.collection_select :flower_id, @flowers, :id, :name, { include_blank: "選択してください" }, class: "form-select" %>
+              </div>
+
+              <div class="col-md-6">
+                <%= f.label :mountain_id, "山", class: "form-label" %>
+                <%= f.collection_select :mountain_id, @mountains, :id, :name, { include_blank: "選択してください" }, class: "form-select" %>
               </div>
             </div>
             
