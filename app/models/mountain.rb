@@ -75,7 +75,7 @@ class Mountain < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["flower_mountains", "flowers", "posts", "favorites"] # 必要な関連のみ
+    ["flower_mountains", "flowers", "posts", "favorites", "notifications"] # 必要な関連のみ
   end
 
   def self.ransackable_attributes(auth_object = nil)
