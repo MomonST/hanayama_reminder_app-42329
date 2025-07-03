@@ -63,7 +63,7 @@ class Flower < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["flower_mountains", "mountains", "posts", "favorites", "likes", "liked_users"]
+    ["flower_mountains", "mountains", "posts", "favorites", "notifications", "likes", "liked_users"]
   end
 
   def self.ransackable_attributes(auth_object = nil)

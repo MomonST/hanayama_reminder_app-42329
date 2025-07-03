@@ -144,6 +144,7 @@ class Notification < ApplicationRecord
       # 自動作成時に必要な初期値を補完（例：peak_month を仮で入れるなら以下）
       new_fm.peak_month = flower.bloom_start_month
       new_fm.bloom_info = "#{flower.name}の見頃予想に基づき自動生成"
+      new_fm.auto_generated = true
     end
 
     # 関連が必要な場合は保持も可（不要ならこの行は不要）

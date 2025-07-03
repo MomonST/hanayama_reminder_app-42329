@@ -50,7 +50,7 @@ class FlowerMountain < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["id", "flower_id", "mountain_id", "peak_month", "bloom_info", "created_at", "updated_at"]
+    ["id", "flower_id", "mountain_id", "peak_month", "bloom_info", "auto_generated", "created_at", "updated_at"]
   end
 
   def self.ransackable_associations(auth_object = nil)
