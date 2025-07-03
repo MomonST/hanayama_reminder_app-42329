@@ -68,15 +68,24 @@
                     <div class="fs-5 fw-bold text-muted mb-1">時期未定</div>
                   <% end %>
                   
+                  <% flower_mountain_exists = @existing_flower_mountains_set.include?([notification.flower_id, notification.mountain_id]) %>
+                  
                   <div class="d-flex gap-2 mt-2">
                     <a href="#" class="btn btn-sm btn-success">
                       <i class="bi bi-calendar-plus me-1"></i>カレンダー
                     </a>
-                    <%= link_to flower_path(notification.flower), class: "btn btn-sm btn-outline-secondary" do %>
-                      花の詳細
-                    <% end %>
-                    <%= link_to mountain_path(notification.mountain), class: "btn btn-sm btn-outline-secondary" do %>
-                      山の詳細
+                    
+                    <% if flower_mountain_exists %>
+                      <%= link_to flower_mountain_by_ids_path(flower_id: notification.flower.id, mountain_id: notification.mountain.id), class: "btn btn-outline-primary" do %>
+                        <i class="fas fa-map-marked-alt me-1"></i> 花山の詳細
+                      <% end %>
+                    <% else %>
+                      <%= link_to flower_path(notification.flower), class: "btn btn-sm btn-outline-secondary" do %>
+                        花の詳細
+                      <% end %>
+                      <%= link_to mountain_path(notification.mountain), class: "btn btn-sm btn-outline-secondary" do %>
+                        山の詳細
+                      <% end %>
                     <% end %>
                   </div>
                 </div>

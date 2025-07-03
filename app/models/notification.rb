@@ -12,6 +12,9 @@ class Notification < ApplicationRecord
 
   # 通知日の自動計算
   before_validation :calculate_notification_date
+
+  #既存のflower_mountainと重複確認
+  before_validation :ensure_flower_mountain_exists
   
   # 今日送信すべき通知を取得
   scope :to_be_sent_today, -> { where(notification_date: Date.today, sent: false) }
@@ -96,6 +99,17 @@ class Notification < ApplicationRecord
     (peak_date - today).to_i
   end
 
+  def url
+    if flower.present? && mountain.present?
+      Rails.application.routes.url_helpers.flower_mountain_by_ids_path(
+        flower_id: flower.id,
+        mountain_id: mountain.id
+      )
+    else
+      root_path
+    end
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     %w[id user_id post_id action checked created_at updated_at]
   end
@@ -121,5 +135,18 @@ class Notification < ApplicationRecord
       # fallback：デフォルトや通知日未設定
       self.notification_date = nil
     end
+  end
+
+  def ensure_flower_mountain_exists
+    return unless flower_id.present? && mountain_id.present?
+
+    fm = FlowerMountain.find_or_create_by(flower_id: flower_id, mountain_id: mountain_id) do |new_fm|
+      # 自動作成時に必要な初期値を補完（例：peak_month を仮で入れるなら以下）
+      new_fm.peak_month = flower.bloom_start_month
+      new_fm.bloom_info = "#{flower.name}の見頃予想に基づき自動生成"
+    end
+
+    # 関連が必要な場合は保持も可（不要ならこの行は不要）
+    # self.flower_mountain = fm
   end
 end

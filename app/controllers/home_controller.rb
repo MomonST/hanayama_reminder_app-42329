@@ -24,6 +24,9 @@ class HomeController < ApplicationController
                                 .includes(:flower, :mountain)
                                 .order(:notification_date)
                                 .limit(4)
+
+    # 花×山の組み合わせが存在する FlowerMountain をまとめて取得（Setに変換）
+    @existing_flower_mountains_set = FlowerMountain.pluck(:flower_id, :mountain_id).to_set
     
     # 人気の投稿を取得
     @popular_posts = Post.popular.includes(:user, :flower, :mountain).limit(3)

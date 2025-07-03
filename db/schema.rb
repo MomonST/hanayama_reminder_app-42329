@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_01_083829) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_03_035909) do
   create_table "active_admin_comments", charset: "utf8mb3", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -53,6 +53,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_01_083829) do
     t.text "bloom_info"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "auto_generated"
     t.index ["flower_id"], name: "index_flower_mountains_on_flower_id"
     t.index ["mountain_id"], name: "index_flower_mountains_on_mountain_id"
   end

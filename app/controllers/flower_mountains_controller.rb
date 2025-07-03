@@ -54,4 +54,26 @@ class FlowerMountainsController < ApplicationController
       )
     end
   end
+
+  def show_by_ids
+    @flower = Flower.find(params[:flower_id])
+    @mountain = Mountain.find(params[:mountain_id])
+
+    # FlowerMountainが既存になければ自動作成（仮データとして）
+    @flower_mountain = FlowerMountain.find_or_initialize_by(flower: @flower, mountain: @mountain)
+    
+    if @flower_mountain.new_record?
+      @flower_mountain.peak_month ||= @flower.bloom_start_month
+      @flower_mountain.bloom_info ||= "#{@flower.name}の見頃情報に基づいて自動生成されたデータです"
+      @flower_mountain.auto_generated = true if @flower_mountain.respond_to?(:auto_generated)
+    
+      if @flower_mountain.save
+        flash[:notice] = "この花と山の組み合わせは自動生成されました。内容は仮情報です。"
+      else
+        redirect_to root_path, alert: "この組み合わせは登録できませんでした。" and return
+      end
+    end
+
+    redirect_to flower_mountain_path(@flower_mountain)
+  end
 end

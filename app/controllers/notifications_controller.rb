@@ -7,6 +7,9 @@ class NotificationsController < ApplicationController
                                 .includes(:flower, :mountain)
                                 .order(:notification_date)
                                 .page(params[:page]).per(10)
+    
+    # 花×山の組み合わせが存在する FlowerMountain をまとめて取得（Setに変換）
+    @existing_flower_mountains_set = FlowerMountain.pluck(:flower_id, :mountain_id).to_set
   end
   
   def new
