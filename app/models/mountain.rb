@@ -4,6 +4,7 @@ class Mountain < ApplicationRecord
   has_many :flowers, through: :flower_mountains
   has_many :posts, dependent: :destroy
   has_many :favorites, through: :flower_mountains
+  has_many :notifications, dependent: :destroy
   
   # バリデーション
   validates :name, presence: true, uniqueness: true

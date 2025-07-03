@@ -4,12 +4,12 @@
       <div class="card-body p-4">
         <h2 class="card-title mb-4"><i class="bi bi-bell me-2"></i>通知設定</h2>
         
-        <% if @flower_mountain %>
+        <% if @notification.flower && @notification.mountain %>
           <div class="alert alert-info mb-4">
             <div class="d-flex align-items-center">
               <div class="me-3">
-                <% if @flower_mountain.flower.image_url.present? %>
-                  <%= image_tag @flower_mountain.flower.image_url.url.presence || "/placeholder.svg", 
+                <% if @notification.flower.image_url.present? %>
+                  <%= image_tag @notification.flower.image_url.url.presence || "/placeholder.svg", 
                       class: "rounded", style: "width: 60px; height: 60px; object-fit: cover;" %>
                 <% else %>
                   <div class="bg-light rounded d-flex align-items-center justify-content-center" 
@@ -20,11 +20,11 @@
               </div>
               
               <div>
-                <h5 class="mb-1"><%= @flower_mountain.mountain.name %></h5>
+                <h5 class="mb-1"><%= @notification.mountain.name %></h5>
                 <p class="mb-0">
-                  <i class="bi bi-flower1 me-1"></i><%= @flower_mountain.flower.name %>
+                  <i class="bi bi-flower1 me-1"></i><%= @notification.flower.name %>
                   <span class="badge bg-light text-dark ms-2">
-                    <%= @flower_mountain.mountain.difficulty_level %>
+                    <%= @notification.mountain.difficulty_level %>
                   </span>
                 </p>
               </div>
@@ -44,18 +44,23 @@
             </div>
           <% end %>
           
-          <% unless @flower_mountain %>
-            <div class="mb-3">
-              <%= f.label :flower_mountain_id, "花山スポット", class: "form-label" %>
-              <%= f.collection_select :flower_mountain_id, FlowerMountain.includes(:flower, :mountain).all, :id, 
-                  ->(fm) { "#{fm.mountain.name} - #{fm.flower.name}" }, 
-                  { selected: @flower_mountain_id, include_blank: "選択してください" }, 
-                  class: "form-select", required: true %>
-            </div>
-          <% else %>
-            <%= f.hidden_field :flower_mountain_id, value: @flower_mountain.id %>
-          <% end %>
+          <!-- 花を選択 -->
+          <div class="mb-3">
+            <%= f.label :flower_id, "花", class: "form-label" %>
+            <%= f.collection_select :flower_id, Flower.all, :id, :name, 
+                { include_blank: "選択してください" }, 
+                class: "form-select", required: true %>
+          </div>
           
+          <!-- 山を選択 -->
+          <div class="mb-3">
+            <%= f.label :mountain_id, "山", class: "form-label" %>
+            <%= f.collection_select :mountain_id, Mountain.all, :id, :name,
+                { include_blank: "選択してください" }, 
+                class: "form-select", required: true %>
+          </div>
+          
+          <!-- 通知タイミング -->
           <div class="mb-4">
             <%= f.label :days_before, "通知タイミング", class: "form-label" %>
             <div class="input-group">
@@ -65,6 +70,7 @@
             <div class="form-text">見頃の何日前に通知を受け取るか設定してください</div>
           </div>
           
+          <!-- ボタン -->
           <div class="d-grid gap-2">
             <%= f.submit "通知を設定する", class: "btn btn-success btn-lg" %>
             <%= link_to "キャンセル", :back, class: "btn btn-outline-secondary" %>

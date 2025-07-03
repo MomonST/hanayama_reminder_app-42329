@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_30_080517) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_03_035909) do
   create_table "active_admin_comments", charset: "utf8mb3", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -53,6 +53,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_30_080517) do
     t.text "bloom_info"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "auto_generated"
     t.index ["flower_id"], name: "index_flower_mountains_on_flower_id"
     t.index ["mountain_id"], name: "index_flower_mountains_on_mountain_id"
   end
@@ -92,7 +93,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_30_080517) do
 
   create_table "notifications", charset: "utf8mb3", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "flower_mountain_id", null: false
     t.integer "days_before"
     t.date "notification_date"
     t.boolean "sent"
@@ -100,7 +100,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_30_080517) do
     t.datetime "updated_at", null: false
     t.string "notification_type", default: "reminder", null: false
     t.string "url"
-    t.index ["flower_mountain_id"], name: "index_notifications_on_flower_mountain_id"
+    t.bigint "flower_id"
+    t.bigint "mountain_id"
+    t.index ["flower_id"], name: "index_notifications_on_flower_id"
+    t.index ["mountain_id"], name: "index_notifications_on_mountain_id"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
@@ -154,7 +157,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_30_080517) do
   add_foreign_key "flower_mountains", "mountains"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
-  add_foreign_key "notifications", "flower_mountains"
+  add_foreign_key "notifications", "flowers"
+  add_foreign_key "notifications", "mountains"
   add_foreign_key "notifications", "users"
   add_foreign_key "post_likes", "posts"
   add_foreign_key "post_likes", "users"

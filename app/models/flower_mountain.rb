@@ -2,7 +2,6 @@ class FlowerMountain < ApplicationRecord
   # アソシエーション
   belongs_to :flower
   belongs_to :mountain
-  has_many :notifications, dependent: :destroy
   has_many :favorites, dependent: :destroy
   
   # バリデーション

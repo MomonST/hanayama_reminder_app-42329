@@ -30,12 +30,6 @@ class FlowerMountainsController < ApplicationController
         days_left: fm.days_until_peak
       }
     end
-    
-    # format.json はAPIコントローラーに一任するため削除を推奨
-    #respond_to do |format|
-      #format.html
-      #format.json { render json: @map_data }
-    #end
   end
   
   def show
@@ -54,7 +48,32 @@ class FlowerMountainsController < ApplicationController
     # ログイン済みの場合、お気に入り状態を確認
     if user_signed_in?
       @favorite = current_user.favorites.find_by(flower_mountain_id: @flower_mountain.id)
-      @notification = current_user.notifications.find_by(flower_mountain_id: @flower_mountain.id)
+      @notification = current_user.notifications.find_by(
+        flower_id: @flower_mountain.flower_id,
+        mountain_id: @flower_mountain.mountain_id
+      )
     end
+  end
+
+  def show_by_ids
+    @flower = Flower.find(params[:flower_id])
+    @mountain = Mountain.find(params[:mountain_id])
+
+    # FlowerMountainが既存になければ自動作成（仮データとして）
+    @flower_mountain = FlowerMountain.find_or_initialize_by(flower: @flower, mountain: @mountain)
+    
+    if @flower_mountain.new_record?
+      @flower_mountain.peak_month ||= @flower.bloom_start_month
+      @flower_mountain.bloom_info ||= "#{@flower.name}の見頃情報に基づいて自動生成されたデータです"
+      @flower_mountain.auto_generated = true if @flower_mountain.respond_to?(:auto_generated)
+    
+      if @flower_mountain.save
+        flash[:notice] = "この花と山の組み合わせは自動生成されました。内容は仮情報です。"
+      else
+        redirect_to root_path, alert: "この組み合わせは登録できませんでした。" and return
+      end
+    end
+
+    redirect_to flower_mountain_path(@flower_mountain)
   end
 end

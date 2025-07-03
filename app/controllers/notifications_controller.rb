@@ -4,47 +4,45 @@ class NotificationsController < ApplicationController
   
   def index
     @notifications = current_user.notifications
-                                .includes(flower_mountain: [:flower, :mountain])
+                                .includes(:flower, :mountain)
                                 .order(:notification_date)
                                 .page(params[:page]).per(10)
+    
+    # 花×山の組み合わせが存在する FlowerMountain をまとめて取得（Setに変換）
+    @existing_flower_mountains_set = FlowerMountain.pluck(:flower_id, :mountain_id).to_set
   end
   
   def new
-    @flower_mountain_id = params[:flower_mountain_id]
-
-    # 既存の通知設定を探す（現在のユーザーがこの花山スポットに対して既に通知設定しているか）
-    # params[:flower_mountain_id] がある場合のみ検索
-    if @flower_mountain_id.present?
-      @notification = current_user.notifications.find_by(flower_mountain_id: @flower_mountain_id)
-    end
-
-    # 見つからなければ新規作成
-    @notification ||= Notification.new
-    @flower_mountain = FlowerMountain.find_by(id: @flower_mountain_id)
+    @notification = Notification.new
+    @flowers = Flower.all
+    @mountains = Mountain.all
   end
   
   def create
     @notification = current_user.notifications.build(notification_params)
     @notification.notification_type = 'reminder' 
     @notification.sent = false # 明示的に未送信として設定
-    @notification.url = flower_mountain_path(@notification.flower_mountain) if @notification.flower_mountain.present?
 
     if @notification.save
       redirect_to notifications_path, notice: "通知が正常に設定されました"
     else
-      @flower_mountain_id = @notification.flower_mountain_id
-      @flower_mountain = FlowerMountain.find_by(id: @flower_mountain_id)
+      @flowers = Flower.all
+      @mountains = Mountain.all
       render :new, status: :unprocessable_entity
     end
   end
   
   def edit
+    @flowers = Flower.all
+    @mountains = Mountain.all
   end
   
   def update
     if @notification.update(notification_params)
       redirect_to notifications_path, notice: "通知設定が更新されました"
     else
+      @flowers = Flower.all
+      @mountains = Mountain.all
       render :edit
     end
   end
@@ -61,6 +59,6 @@ class NotificationsController < ApplicationController
   end
   
   def notification_params
-    params.require(:notification).permit(:flower_mountain_id, :days_before, :notification_type, :url)
+    params.require(:notification).permit(:flower_id, :mountain_id, :days_before, :notification_type)
   end
 end

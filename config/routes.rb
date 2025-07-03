@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   # 静的ページ
   get 'about', to: 'home#about'
 
+  #カスタムで花×山から id を探す
+  get 'flower_mountains/by_flower_and_mountain/:flower_id/:mountain_id', to: 'flower_mountains#show_by_ids', as: 'flower_mountain_by_ids'
+
   # Usersの編集・表示関連
   resources :users, only: [:show, :edit, :update]
 

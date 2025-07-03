@@ -6,6 +6,7 @@ class Flower < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_many :liked_users, through: :likes, source: :user
   has_many :favorites, through: :flower_mountains
+  has_many :notifications, dependent: :destroy
   
   # バリデーション
   validates :name, presence: true, uniqueness: true
